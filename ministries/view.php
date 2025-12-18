@@ -28,7 +28,7 @@ $ministry = $result->fetch_assoc();
 $stmt->close();
 
 // Get members
-$stmt = $conn->prepare("SELECT m.*, mm.role, mm.joined_date, mm.status FROM Members m INNER JOIN Ministry_Members mm ON m.mem_id = mm.member_id WHERE mm.ministry_id = ? AND mm.status = 'Active' ORDER BY m.last_name, m.first_name");
+$stmt = $conn->prepare("SELECT m.*, mm.role FROM Members m INNER JOIN Ministry_Members mm ON m.mem_id = mm.member_id WHERE mm.ministry_id = ? ORDER BY m.last_name, m.first_name");
 $stmt->bind_param("i", $ministry_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -105,10 +105,10 @@ include __DIR__ . '/../includes/header.php';
                 <?php foreach ($members as $member): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars($member['first_name'] . ' ' . ($member['middle_initials'] ? $member['middle_initials'] . ' ' : '') . $member['last_name']); ?></strong></td>
-                    <td><?php echo htmlspecialchars($member['email'] ?: '-'); ?></td>
-                    <td><?php echo htmlspecialchars($member['home_phone'] ?: '-'); ?></td>
-                    <td><?php echo htmlspecialchars($member['role'] ?: '-'); ?></td>
-                    <td><?php echo formatDate($member['joined_date']); ?></td>
+                    <td><?php echo htmlspecialchars($member['email'] ?? '-'); ?></td>
+                    <td><?php echo htmlspecialchars(($member['contact_home'] ?? '') ?: ($member['contact_work'] ?? '-')); ?></td>
+                    <td><?php echo htmlspecialchars($member['role'] ?? '-'); ?></td>
+                    <td><?php echo formatDate($member['date_joined'] ?? null); ?></td>
                     <td>
                         <a href="<?php echo BASE_URL; ?>members/view.php?id=<?php echo $member['mem_id']; ?>" class="btn btn-sm btn-secondary btn-icon" title="View">
                             <i class="fas fa-eye"></i>
