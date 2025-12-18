@@ -18,13 +18,15 @@ $result = $conn->query("SELECT COUNT(*) as count FROM Ministries");
 $totalMinistries = $result->fetch_assoc()['count'];
 
 // Get members by ministry
-$result = $conn->query("
-    SELECT mi.name, COUNT(mm.id) as active_members
+$query = "SELECT mi.name, COUNT(mm.id) as active_members
     FROM Ministries mi
     LEFT JOIN Ministry_Members mm ON mi.id = mm.ministry_id
     GROUP BY mi.id
-    ORDER BY active_members DESC
-");
+    ORDER BY active_members DESC";
+$result = $conn->query($query);
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 $membersByMinistry = $result->fetch_all(MYSQLI_ASSOC);
 
 $totalActiveInMinistries = array_sum(array_column($membersByMinistry, 'active_members'));
