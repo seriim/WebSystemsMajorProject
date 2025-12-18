@@ -21,7 +21,7 @@ $totalMinistries = $result->fetch_assoc()['count'];
 $result = $conn->query("
     SELECT mi.name, COUNT(mm.id) as active_members
     FROM Ministries mi
-    LEFT JOIN Ministry_Members mm ON mi.id = mm.ministry_id AND mm.status = 'Active'
+    LEFT JOIN Ministry_Members mm ON mi.id = mm.ministry_id
     GROUP BY mi.id
     ORDER BY active_members DESC
 ");

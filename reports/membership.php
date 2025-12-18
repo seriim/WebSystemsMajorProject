@@ -179,7 +179,7 @@ $currentReport = 'membership';
                     <td><?php echo htmlspecialchars($member['gender'] ?: '-'); ?></td>
                     <td><?php echo formatDate($member['dob']); ?></td>
                     <td><?php echo htmlspecialchars($member['email'] ?: '-'); ?></td>
-                    <td><?php echo htmlspecialchars($member['home_phone'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars(($member['contact_home'] ?? '') ?: ($member['contact_work'] ?? '-')); ?></td>
                     <td><?php echo formatDate($member['date_joined']); ?></td>
                 </tr>
                 <?php endforeach; ?>

@@ -20,12 +20,12 @@ $ministries = $ministriesResult->fetch_all(MYSQLI_ASSOC);
 $query = "
     SELECT mi.name, 
            COUNT(DISTINCT mm.member_id) as member_count,
-           COUNT(DISTINCT mma.id) as meeting_count,
-           SUM(mma.count) as total_attendance
+           COUNT(DISTINCT a.id) as meeting_count,
+           SUM(a.count) as total_attendance
     FROM Ministries mi
-    LEFT JOIN Ministry_Members mm ON mi.id = mm.ministry_id AND mm.status = 'Active'
-    LEFT JOIN ministry_meeting_attendance mma ON mi.id = mma.ministry_id 
-           AND mma.date BETWEEN '$startDate' AND '$endDate'
+    LEFT JOIN Ministry_Members mm ON mi.id = mm.ministry_id
+    LEFT JOIN Attendance a ON mi.id = a.ministry_id 
+           AND a.date BETWEEN '$startDate' AND '$endDate'
     WHERE 1=1
 ";
 
@@ -41,7 +41,7 @@ $participation = $result->fetch_all(MYSQLI_ASSOC);
 // Get detailed member list if ministry selected
 $members = [];
 if ($ministryId) {
-    $stmt = $conn->prepare("SELECT m.*, mm.role, mm.joined_date FROM Members m INNER JOIN Ministry_Members mm ON m.mem_id = mm.member_id WHERE mm.ministry_id = ? AND mm.status = 'Active' ORDER BY m.last_name, m.first_name");
+    $stmt = $conn->prepare("SELECT m.*, mm.role FROM Members m INNER JOIN Ministry_Members mm ON m.mem_id = mm.member_id WHERE mm.ministry_id = ? ORDER BY m.last_name, m.first_name");
     $stmt->bind_param("i", $ministryId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -164,9 +164,9 @@ $currentReport = 'milestones';
                 <tr>
                     <td><?php echo htmlspecialchars($member['first_name'] . ' ' . ($member['middle_initials'] ? $member['middle_initials'] . ' ' : '') . $member['last_name']); ?></td>
                     <td><?php echo htmlspecialchars($member['email'] ?: '-'); ?></td>
-                    <td><?php echo htmlspecialchars($member['home_phone'] ?: '-'); ?></td>
-                    <td><?php echo htmlspecialchars($member['role'] ?: '-'); ?></td>
-                    <td><?php echo formatDate($member['joined_date']); ?></td>
+                    <td><?php echo htmlspecialchars(($member['contact_home'] ?? '') ?: ($member['contact_work'] ?? '-')); ?></td>
+                    <td><?php echo htmlspecialchars($member['role'] ?? '-'); ?></td>
+                    <td><?php echo formatDate($member['date_joined'] ?? null); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
