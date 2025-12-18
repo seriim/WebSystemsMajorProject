@@ -101,23 +101,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Remove all existing
             $stmt2 = $conn->prepare("DELETE FROM Ministry_Members WHERE member_id = ?");
             $stmt2->bind_param("i", $member_id);
-            $stmt2->execute();
-            $stmt2->close();
-            
-            // Add selected ministries
-            foreach ($selected_ministries as $ministry_id) {
-                $ministry_id = intval($ministry_id);
-                $stmt3 = $conn->prepare("INSERT INTO Ministry_Members (member_id, ministry_id) VALUES (?, ?)");
-                $stmt3->bind_param("ii", $member_id, $ministry_id);
-                $stmt3->execute();
-                $stmt3->close();
+            if (!$stmt2->execute()) {
+                $error = 'Error updating ministries: ' . $conn->error;
+                $stmt2->close();
+                $stmt->close();
+            } else {
+                $stmt2->close();
+                
+                // Add selected ministries
+                foreach ($selected_ministries as $ministry_id) {
+                    $ministry_id = intval($ministry_id);
+                    $stmt3 = $conn->prepare("INSERT INTO Ministry_Members (member_id, ministry_id) VALUES (?, ?)");
+                    $stmt3->bind_param("ii", $member_id, $ministry_id);
+                    if (!$stmt3->execute()) {
+                        $error = 'Error adding ministry: ' . $conn->error;
+                        $stmt3->close();
+                        break;
+                    }
+                    $stmt3->close();
+                }
+                
+                if (empty($error)) {
+                    $stmt->close();
+                    header('Location: ' . BASE_URL . 'members/view.php?id=' . $member_id . '&updated=1');
+                    exit();
+                }
             }
-            
-            $stmt->close();
-            header('Location: ' . BASE_URL . 'members/view.php?id=' . $member_id . '&updated=1');
-            exit();
         } else {
             $error = 'Error updating member: ' . $conn->error;
+            $stmt->close();
         }
     }
 }

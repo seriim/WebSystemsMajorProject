@@ -10,12 +10,41 @@ $conn = getDBConnection();
 // Handle delete
 if (isset($_GET['delete']) && hasAnyRole(['Administrator', 'Clerk'])) {
     $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM Members WHERE mem_id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-    header('Location: ' . BASE_URL . 'members/index.php?deleted=1');
-    exit();
+    
+    // Start transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Delete related records first (cascade delete)
+        // Delete ministry memberships
+        $stmt1 = $conn->prepare("DELETE FROM Ministry_Members WHERE member_id = ?");
+        $stmt1->bind_param("i", $id);
+        $stmt1->execute();
+        $stmt1->close();
+        
+        // Delete events
+        $stmt2 = $conn->prepare("DELETE FROM Events WHERE member_id = ?");
+        $stmt2->bind_param("i", $id);
+        $stmt2->execute();
+        $stmt2->close();
+        
+        // Now delete the member
+        $stmt3 = $conn->prepare("DELETE FROM Members WHERE mem_id = ?");
+        $stmt3->bind_param("i", $id);
+        
+        if ($stmt3->execute()) {
+            $conn->commit();
+            $stmt3->close();
+            header('Location: ' . BASE_URL . 'members/index.php?deleted=1');
+            exit();
+        } else {
+            throw new Exception('Error deleting member: ' . $conn->error);
+        }
+    } catch (Exception $e) {
+        $conn->rollback();
+        header('Location: ' . BASE_URL . 'members/index.php?error=' . urlencode($e->getMessage()));
+        exit();
+    }
 }
 
 // Get search term
@@ -70,6 +99,10 @@ include __DIR__ . '/../includes/header.php';
     
     <?php if (isset($_GET['deleted'])): ?>
         <div class="alert alert-success">Member deleted successfully.</div>
+    <?php endif; ?>
+    
+    <?php if (isset($_GET['error'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
     <?php endif; ?>
     
     <?php if (count($members) > 0): ?>

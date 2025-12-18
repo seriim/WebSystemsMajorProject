@@ -12,10 +12,17 @@ if (isset($_GET['delete']) && hasAnyRole(['Administrator', 'Clerk'])) {
     $id = intval($_GET['delete']);
     $stmt = $conn->prepare("DELETE FROM Events WHERE id = ?");
     $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-    header('Location: ' . BASE_URL . 'events/index.php?deleted=1');
-    exit();
+    
+    if ($stmt->execute()) {
+        $stmt->close();
+        header('Location: ' . BASE_URL . 'events/index.php?deleted=1');
+        exit();
+    } else {
+        $error = 'Error deleting event: ' . $conn->error;
+        $stmt->close();
+        header('Location: ' . BASE_URL . 'events/index.php?error=' . urlencode($error));
+        exit();
+    }
 }
 
 // Get statistics

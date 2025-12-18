@@ -75,19 +75,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $member_id = $conn->insert_id;
             
             // Add to ministries
+            $ministryError = false;
             foreach ($selected_ministries as $ministry_id) {
                 $ministry_id = intval($ministry_id);
                 $stmt2 = $conn->prepare("INSERT INTO Ministry_Members (member_id, ministry_id) VALUES (?, ?)");
                 $stmt2->bind_param("ii", $member_id, $ministry_id);
-                $stmt2->execute();
+                if (!$stmt2->execute()) {
+                    $error = 'Error adding ministry: ' . $conn->error;
+                    $ministryError = true;
+                    $stmt2->close();
+                    break;
+                }
                 $stmt2->close();
             }
             
-            $stmt->close();
-            header('Location: ' . BASE_URL . 'members/index.php?added=1');
-            exit();
+            if (!$ministryError) {
+                $stmt->close();
+                header('Location: ' . BASE_URL . 'members/view.php?id=' . $member_id . '&added=1');
+                exit();
+            } else {
+                $stmt->close();
+            }
         } else {
             $error = 'Error adding member: ' . $conn->error;
+            $stmt->close();
         }
     }
 }
