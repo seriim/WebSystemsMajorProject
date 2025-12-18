@@ -154,7 +154,17 @@ $currentReport = 'membership';
     </div>
     
     <h5 class="mb-3">Members by Age Group</h5>
-    <canvas id="ageGroupChart" height="100"></canvas>
+    <?php if (count($ageGroups) > 0): ?>
+        <div style="position: relative; height: 300px; margin-bottom: 32px;">
+            <canvas id="ageGroupChart"></canvas>
+        </div>
+    <?php else: ?>
+        <div class="empty-state" style="margin-bottom: 32px;">
+            <i class="fas fa-chart-bar"></i>
+            <h3>No age group data available</h3>
+            <p>Member date of birth information is needed to generate age group statistics.</p>
+        </div>
+    <?php endif; ?>
     
     <h5 class="mb-3 mt-4">Member List</h5>
     <?php if (count($members) > 0): ?>
@@ -194,39 +204,71 @@ $currentReport = 'membership';
     <?php endif; ?>
 </div>
 
+<?php if (count($ageGroups) > 0): ?>
 <script>
-const ageGroupCtx = document.getElementById('ageGroupChart').getContext('2d');
-const ageGroupChart = new Chart(ageGroupCtx, {
-    type: 'bar',
-    data: {
-        labels: <?php echo json_encode(array_column($ageGroups, 'age_group')); ?>,
-        datasets: [{
-            label: 'Members',
-            data: <?php echo json_encode(array_column($ageGroups, 'count')); ?>,
-            backgroundColor: '#A8D5E2',
-            borderColor: '#7BB3C7',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                display: false
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('ageGroupChart');
+    if (!canvas) return;
+    
+    const ageGroupCtx = canvas.getContext('2d');
+    if (!ageGroupCtx) return;
+    
+    const ageGroups = <?php echo json_encode($ageGroups); ?>;
+    const labels = ageGroups.map(function(g) { return g.age_group; });
+    const data = ageGroups.map(function(g) { return parseInt(g.count) || 0; });
+    
+    new Chart(ageGroupCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Members',
+                data: data,
+                backgroundColor: '#A8D5E2',
+                borderColor: '#7BB3C7',
+                borderWidth: 1
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
-    }
+    });
 });
 </script>
+<?php endif; ?>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 
