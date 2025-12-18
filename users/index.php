@@ -12,11 +12,36 @@ $conn = getDBConnection();
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     if ($id != $_SESSION['user_id']) {
-        $stmt = $conn->prepare("DELETE FROM Users WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: ' . BASE_URL . 'users/index.php?deleted=1');
+        // Start transaction
+        $conn->begin_transaction();
+        
+        try {
+            // Delete related records first (cascade delete)
+            // Set recorded_by to NULL in Attendance records
+            $stmt1 = $conn->prepare("UPDATE Attendance SET recorded_by = NULL WHERE recorded_by = ?");
+            $stmt1->bind_param("i", $id);
+            $stmt1->execute();
+            $stmt1->close();
+            
+            // Now delete the user
+            $stmt2 = $conn->prepare("DELETE FROM Users WHERE id = ?");
+            $stmt2->bind_param("i", $id);
+            
+            if ($stmt2->execute()) {
+                $conn->commit();
+                $stmt2->close();
+                header('Location: ' . BASE_URL . 'users/index.php?deleted=1');
+                exit();
+            } else {
+                throw new Exception('Error deleting user: ' . $conn->error);
+            }
+        } catch (Exception $e) {
+            $conn->rollback();
+            header('Location: ' . BASE_URL . 'users/index.php?error=' . urlencode($e->getMessage()));
+            exit();
+        }
+    } else {
+        header('Location: ' . BASE_URL . 'users/index.php?error=' . urlencode('You cannot delete your own account'));
         exit();
     }
 }
@@ -51,6 +76,10 @@ include __DIR__ . '/../includes/header.php';
         <div class="alert alert-success">User deleted successfully.</div>
     <?php endif; ?>
     
+    <?php if (isset($_GET['error'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+    <?php endif; ?>
+    
     <?php if (count($users) > 0): ?>
     <div class="table-container">
         <table class="table">
@@ -67,9 +96,9 @@ include __DIR__ . '/../includes/header.php';
                 <?php foreach ($users as $user): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars($user['username']); ?></strong></td>
-                    <td><?php echo htmlspecialchars($user['role_name']); ?></td>
-                    <td><span class="badge badge-<?php echo $user['status'] === 'active' ? 'success' : 'danger'; ?>"><?php echo ucfirst($user['status']); ?></span></td>
-                    <td><?php echo formatDate($user['created_at']); ?></td>
+                    <td><?php echo htmlspecialchars($user['role_name'] ?? 'N/A'); ?></td>
+                    <td><span class="badge badge-<?php echo ($user['status'] ?? 'Inactive') === 'Active' ? 'success' : 'danger'; ?>"><?php echo ucfirst($user['status'] ?? 'Inactive'); ?></span></td>
+                    <td>-</td>
                     <td>
                         <div class="action-buttons">
                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
