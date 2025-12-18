@@ -17,28 +17,28 @@
 USE church_system_database;
 
 -- Password hash for 'test123' (using PHP password_hash)
--- $2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y
+-- Generated hash: $2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG
 
 -- Clear existing test users (optional - comment out if you want to keep existing data)
--- DELETE FROM Users WHERE username LIKE 'test_%';
+DELETE FROM Users WHERE username LIKE 'test_%';
 
 -- Insert test users for each role
 -- Password for all: test123
-INSERT IGNORE INTO Users (username, password, role, status) VALUES
--- Administrator (role_id = 1)
-('test_admin', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y', 1, 'Active'),
+INSERT INTO Users (username, password, role, status) VALUES
+-- Administrator (role_id = 1) - Full system access
+('test_admin', '$2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG', 1, 'Active'),
 
--- Pastor (role_id = 2)
-('test_pastor', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y', 2, 'Active'),
+-- Pastor (role_id = 2) - Spiritual leader access
+('test_pastor', '$2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG', 2, 'Active'),
 
--- Ministry Leader (role_id = 3)
-('test_leader', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y', 3, 'Active'),
+-- Ministry Leader (role_id = 3) - Ministry-specific access
+('test_leader', '$2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG', 3, 'Active'),
 
--- Clerk (role_id = 4)
-('test_clerk', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y', 4, 'Active'),
+-- Clerk (role_id = 4) - Administrative tasks
+('test_clerk', '$2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG', 4, 'Active'),
 
--- Member (role_id = 5)
-('test_member', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyY5Y5Y5Y5Y5Y', 5, 'Active');
+-- Member (role_id = 5) - Basic read-only access
+('test_member', '$2y$12$Q.fpQrd9cjNfSVv7aEEKUeDUPdIAQoe.t7ihLdx672OnV0dR/ZatG', 5, 'Active');
 
 -- Verify the users were created
 SELECT 
