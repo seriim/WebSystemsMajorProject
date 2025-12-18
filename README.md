@@ -46,27 +46,7 @@ A comprehensive web-based church management system built with PHP, MySQL, JavaSc
    - Navigate to `http://localhost/labs/MajorProjectFinal/`
    - Login with admin credentials
 
-## Project Structure
 
-```
-MajorProjectFinal/
-├── assets/
-│   ├── css/          # Stylesheets
-│   ├── js/           # JavaScript files
-│   └── images/       # Images and icons
-├── attendance/       # Attendance management pages
-├── config/           # Configuration files
-├── database/         # SQL schema and data files
-├── events/           # Event management pages
-├── includes/         # Reusable components (header, footer)
-├── members/          # Member management pages
-├── ministries/       # Ministry management pages
-├── reports/          # Report generation pages
-├── users/            # User management pages
-├── login.php         # Login page
-├── index.php         # Dashboard
-└── README.md         # This file
-```
 
 ## Role-Based Access Control
 
@@ -91,33 +71,7 @@ The database includes the following tables:
 - `Events` - Church events and milestones
 - `Attendance` - Attendance records
 
-See `database/schema.sql` for complete schema.
 
-## Security Features
-
-- Password hashing using PHP `password_hash()`
-- SQL injection prevention using prepared statements
-- XSS prevention using `htmlspecialchars()`
-- Session management
-- Role-based access control
-- Input sanitization
-
-## Development
-
-### Adding New Features
-
-1. Follow the existing code structure
-2. Use prepared statements for database queries
-3. Implement role-based access control where needed
-4. Sanitize all user inputs
-5. Use the reusable header/footer components
-
-### Code Style
-
-- Use meaningful variable names
-- Comment complex logic
-- Follow PSR-12 coding standards
-- Use consistent indentation (4 spaces)
 
 ## Authors
 
@@ -126,16 +80,3 @@ See `database/schema.sql` for complete schema.
 - Serena Morris (2208659)
 - Jahzeal Simms (2202446)
 
-## License
-
-This project is developed for educational purposes.
-
-## Version Control
-
-This project uses Git for version control. To contribute:
-
-```bash
-git add .
-git commit -m "Your commit message"
-git push
-```
