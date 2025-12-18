@@ -102,5 +102,13 @@ function formatDateTime($datetime) {
     }
     return date('M d, Y h:i A', strtotime($datetime));
 }
+
+// Truncate string to match database column length
+function truncateToLength($string, $maxLength) {
+    if ($string === null) {
+        return null;
+    }
+    return mb_substr($string, 0, $maxLength);
+}
 ?>
 

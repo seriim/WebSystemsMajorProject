@@ -49,14 +49,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($first_name) || empty($last_name)) {
         $error = 'First name and last name are required.';
     } else {
-        $stmt = $conn->prepare("INSERT INTO Members (first_name, middle_initials, last_name, dob, gender, home_address1, home_address2, town, parish, contact_home, contact_work, email, next_of_kin_name, next_of_kin_address, next_of_kin_relation, next_of_kin_contact, next_of_kin_email, status, date_joined) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Truncate fields to match database column sizes (before converting to null)
+        $first_name = truncateToLength($first_name, 50);
+        $middle_initials = !empty(trim($middle_initials)) ? truncateToLength($middle_initials, 10) : null;
+        $last_name = truncateToLength($last_name, 50);
+        $home_address1 = !empty(trim($home_address1)) ? truncateToLength($home_address1, 100) : null;
+        $home_address2 = !empty(trim($home_address2)) ? truncateToLength($home_address2, 100) : null;
+        $town = !empty(trim($town)) ? truncateToLength($town, 50) : null;
+        $parish = !empty(trim($parish)) ? truncateToLength($parish, 50) : null;
+        $contact_home = $contact_home ? (!empty(trim($contact_home)) ? truncateToLength($contact_home, 20) : null) : null;
+        $contact_work = $contact_work ? (!empty(trim($contact_work)) ? truncateToLength($contact_work, 20) : null) : null;
+        $email = $email ? (!empty(trim($email)) ? truncateToLength($email, 100) : null) : null;
+        $next_of_kin_name = $next_of_kin_name ? (!empty(trim($next_of_kin_name)) ? truncateToLength($next_of_kin_name, 100) : null) : null;
+        $next_of_kin_address = $next_of_kin_address ? (!empty(trim($next_of_kin_address)) ? truncateToLength($next_of_kin_address, 150) : null) : null;
+        $next_of_kin_relation = $next_of_kin_relation ? (!empty(trim($next_of_kin_relation)) ? truncateToLength($next_of_kin_relation, 50) : null) : null;
+        $next_of_kin_contact = $next_of_kin_contact ? (!empty(trim($next_of_kin_contact)) ? truncateToLength($next_of_kin_contact, 20) : null) : null;
+        $next_of_kin_email = $next_of_kin_email ? (!empty(trim($next_of_kin_email)) ? truncateToLength($next_of_kin_email, 100) : null) : null;
         
-        // Convert empty strings to null for optional fields to avoid unique constraint violations
-        $middle_initials = !empty(trim($middle_initials)) ? $middle_initials : null;
-        $home_address1 = !empty(trim($home_address1)) ? $home_address1 : null;
-        $home_address2 = !empty(trim($home_address2)) ? $home_address2 : null;
-        $town = !empty(trim($town)) ? $town : null;
-        $parish = !empty(trim($parish)) ? $parish : null;
+        $stmt = $conn->prepare("INSERT INTO Members (first_name, middle_initials, last_name, dob, gender, home_address1, home_address2, town, parish, contact_home, contact_work, email, next_of_kin_name, next_of_kin_address, next_of_kin_relation, next_of_kin_contact, next_of_kin_email, status, date_joined) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         $stmt->bind_param("sssssssssssssssssss", 
             $first_name, $middle_initials, $last_name, $dob, $gender, $home_address1, $home_address2, $town, $parish, $contact_home, $contact_work, $email, $next_of_kin_name, $next_of_kin_address, $next_of_kin_relation, $next_of_kin_contact, $next_of_kin_email, $status, $date_joined);
