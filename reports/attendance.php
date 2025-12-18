@@ -24,11 +24,15 @@ if (!$result) {
 $monthlyData = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get ministry meeting attendance
-$query = "SELECT mi.name, SUM(a.count) as total_attendance, COUNT(a.id) as meeting_count
+$query = "SELECT mi.name, 
+    COALESCE(SUM(a.count), 0) as total_attendance, 
+    COUNT(a.id) as meeting_count
     FROM Ministries mi
-    LEFT JOIN Attendance a ON mi.id = a.ministry_id
-    WHERE MONTH(a.date) = $month AND YEAR(a.date) = $year
+    LEFT JOIN Attendance a ON mi.id = a.ministry_id 
+        AND MONTH(a.date) = $month 
+        AND YEAR(a.date) = $year
     GROUP BY mi.id
+    HAVING meeting_count > 0
     ORDER BY total_attendance DESC";
 $result = $conn->query($query);
 if (!$result) {
@@ -94,7 +98,17 @@ $currentReport = 'attendance';
     </form>
     
     <h5 class="mb-3">Monthly Attendance Trend</h5>
-    <canvas id="attendanceChart" height="100"></canvas>
+    <?php if (count($monthlyData) > 0): ?>
+        <div style="position: relative; height: 300px; margin-bottom: 32px;">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    <?php else: ?>
+        <div class="empty-state" style="margin-bottom: 32px;">
+            <i class="fas fa-chart-line"></i>
+            <h3>No attendance data for this period</h3>
+            <p>Select a different month or year to view attendance trends.</p>
+        </div>
+    <?php endif; ?>
     
     <h5 class="mb-3 mt-4">Ministry Meeting Attendance</h5>
     <?php if (count($ministryAttendance) > 0): ?>
@@ -128,37 +142,78 @@ $currentReport = 'attendance';
     <?php endif; ?>
 </div>
 
+<?php if (count($monthlyData) > 0): ?>
 <script>
-const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
-const attendanceChart = new Chart(attendanceCtx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode(array_map(function($d) { return date('M d', strtotime($d['date'])); }, $monthlyData)); ?>,
-        datasets: [{
-            label: 'Attendance',
-            data: <?php echo json_encode(array_column($monthlyData, 'total_attendance')); ?>,
-            borderColor: '#7BB3C7',
-            backgroundColor: 'rgba(123, 179, 199, 0.1)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                display: false
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('attendanceChart');
+    if (!canvas) return;
+    
+    const attendanceCtx = canvas.getContext('2d');
+    if (!attendanceCtx) return;
+    
+    const monthlyData = <?php echo json_encode($monthlyData); ?>;
+    const labels = monthlyData.map(function(d) { 
+        return new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); 
+    });
+    const data = monthlyData.map(function(d) { 
+        return parseInt(d.total_attendance) || 0; 
+    });
+    
+    new Chart(attendanceCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Attendance',
+                data: data,
+                borderColor: '#7BB3C7',
+                backgroundColor: 'rgba(123, 179, 199, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 50
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
             }
         }
-    }
+    });
 });
 </script>
+<?php endif; ?>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 
