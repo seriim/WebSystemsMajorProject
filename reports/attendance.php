@@ -12,24 +12,28 @@ $month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
 $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 
 // Monthly attendance summary
-$result = $conn->query("
-    SELECT date, SUM(number_attended) as total_attendance
+$query = "SELECT date, SUM(count) as total_attendance
     FROM Attendance
     WHERE MONTH(date) = $month AND YEAR(date) = $year
     GROUP BY date
-    ORDER BY date
-");
+    ORDER BY date";
+$result = $conn->query($query);
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 $monthlyData = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get ministry meeting attendance
-$result = $conn->query("
-    SELECT mi.name, SUM(mma.count) as total_attendance, COUNT(mma.id) as meeting_count
+$query = "SELECT mi.name, SUM(a.count) as total_attendance, COUNT(a.id) as meeting_count
     FROM Ministries mi
-    LEFT JOIN ministry_meeting_attendance mma ON mi.id = mma.ministry_id
-    WHERE MONTH(mma.date) = $month AND YEAR(mma.date) = $year
+    LEFT JOIN Attendance a ON mi.id = a.ministry_id
+    WHERE MONTH(a.date) = $month AND YEAR(a.date) = $year
     GROUP BY mi.id
-    ORDER BY total_attendance DESC
-");
+    ORDER BY total_attendance DESC";
+$result = $conn->query($query);
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 $ministryAttendance = $result->fetch_all(MYSQLI_ASSOC);
 
 closeDBConnection($conn);
