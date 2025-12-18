@@ -173,6 +173,24 @@ include __DIR__ . '/../includes/header.php';
 </div>
 <?php endif; ?>
 
+<div class="attendance-actions-bar">
+    <div class="attendance-filters">
+        <form method="GET" action="" class="attendance-filter-form">
+            <select class="form-select" name="category">
+                <option value="">All Categories</option>
+                <option value="ages_3_under" <?php echo $categoryFilter === 'ages_3_under' ? 'selected' : ''; ?>>Ages 3 and Under</option>
+                <option value="ages_9_11" <?php echo $categoryFilter === 'ages_9_11' ? 'selected' : ''; ?>>Ages 9-11</option>
+                <option value="ages_12_above" <?php echo $categoryFilter === 'ages_12_above' ? 'selected' : ''; ?>>Ages 12+</option>
+            </select>
+            <input type="date" class="form-control" name="date" value="<?php echo $dateFilter; ?>">
+            <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+            <?php if ($categoryFilter || $dateFilter): ?>
+            <a href="<?php echo BASE_URL; ?>attendance/sunday-school.php" class="btn btn-secondary btn-sm">Clear</a>
+            <?php endif; ?>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
         <div>
