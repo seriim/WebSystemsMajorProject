@@ -1,0 +1,15 @@
+# Custom Error Pages
+ErrorDocument 404 /labs/MajorProjectFinal/404.php
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "\.(sql|log|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
