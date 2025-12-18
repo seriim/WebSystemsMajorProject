@@ -1,0 +1,41 @@
+# XAMPP
+.htaccess.local
+
+# IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+error_log
+php_error_log
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Database backups
+*.sql.backup
+*.sql.bak
+backup/
+
+# Environment files
+.env
+.env.local
+config.local.php
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+
+# Composer (if any)
+vendor/
+composer.lock
+
