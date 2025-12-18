@@ -1462,6 +1462,18 @@ body {
 .action-buttons {
     display: flex;
     gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Center action button when it's the only one */
+.action-buttons:has(:only-child) {
+    justify-content: center;
+}
+
+/* Fallback for browsers that don't support :has() - center single button */
+.action-buttons > *:only-child {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .btn-icon {
