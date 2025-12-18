@@ -1524,9 +1524,21 @@ body {
 /* Upcoming Sections */
 .upcoming-sections {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     margin-bottom: 32px;
+}
+
+@media (max-width: 992px) {
+    .upcoming-sections {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .upcoming-sections {
+        grid-template-columns: 1fr;
+    }
 }
 
 .upcoming-section-card {
@@ -1537,6 +1549,10 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     text-align: center;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .upcoming-section-card:hover {
@@ -1598,6 +1614,19 @@ body {
     color: var(--text-light);
     margin: 20px 0 0 0;
     text-align: center;
+}
+
+.upcoming-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--blue-primary);
+    margin: 12px 0 4px 0;
+}
+
+.upcoming-stat-label {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 16px;
 }
 
 /* Responsive */

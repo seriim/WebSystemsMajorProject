@@ -14,15 +14,9 @@ $eventType = isset($_GET['event_type']) ? sanitizeInput($_GET['event_type']) : '
 $startDate = date('Y-m-d', strtotime("+$week weeks monday"));
 $endDate = date('Y-m-d', strtotime("+$week weeks sunday"));
 
-// Upcoming birthdays (next 7 days)
+// Get birthday statistics (count for next 7 days)
 $result = $conn->query("
-    SELECT first_name, last_name, dob, 
-           DATE_FORMAT(dob, '%m-%d') as month_day,
-           CASE 
-               WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
-               THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
-               ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
-           END as next_year
+    SELECT COUNT(*) as count
     FROM Members 
     WHERE dob IS NOT NULL 
     AND DATE(CONCAT(
@@ -32,21 +26,36 @@ $result = $conn->query("
             ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
         END, '-', DATE_FORMAT(dob, '%m-%d')
     )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
-    ORDER BY DATE(CONCAT(
+");
+$birthdayStats = $result->fetch_assoc();
+
+// Get top 5 upcoming birthdays for display
+$result = $conn->query("
+    SELECT first_name, last_name, dob, 
+           DATE(CONCAT(
+               CASE 
+                   WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                   THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                   ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+               END, '-', DATE_FORMAT(dob, '%m-%d')
+           )) as next_birthday
+    FROM Members 
+    WHERE dob IS NOT NULL 
+    AND DATE(CONCAT(
         CASE 
             WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
             THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
             ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
         END, '-', DATE_FORMAT(dob, '%m-%d')
-    ))
-    LIMIT 10
+    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY next_birthday
+    LIMIT 5
 ");
 $birthdays = $result->fetch_all(MYSQLI_ASSOC);
 
-// Upcoming anniversaries (next 7 days) - using date_joined as anniversary date
+// Get anniversary statistics (count for next 7 days) - using date_joined as anniversary date
 $result = $conn->query("
-    SELECT first_name, last_name, date_joined,
-           DATE_FORMAT(date_joined, '%m-%d') as month_day
+    SELECT COUNT(*) as count
     FROM Members 
     WHERE date_joined IS NOT NULL 
     AND DATE(CONCAT(
@@ -56,23 +65,47 @@ $result = $conn->query("
             ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
         END, '-', DATE_FORMAT(date_joined, '%m-%d')
     )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
-    ORDER BY DATE(CONCAT(
+");
+$anniversaryStats = $result->fetch_assoc();
+
+// Get top 5 upcoming anniversaries for display
+$result = $conn->query("
+    SELECT first_name, last_name, date_joined,
+           DATE(CONCAT(
+               CASE 
+                   WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                   THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                   ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+               END, '-', DATE_FORMAT(date_joined, '%m-%d')
+           )) as next_anniversary
+    FROM Members 
+    WHERE date_joined IS NOT NULL 
+    AND DATE(CONCAT(
         CASE 
             WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
             THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
             ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
         END, '-', DATE_FORMAT(date_joined, '%m-%d')
-    ))
-    LIMIT 10
+    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY next_anniversary
+    LIMIT 5
 ");
 $anniversaries = $result->fetch_all(MYSQLI_ASSOC);
 
-// Upcoming events (next 14 days)
+// Get event statistics (count for next 14 days)
+$query = "SELECT COUNT(*) as count FROM Events WHERE date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 14 DAY)";
+if ($eventType) {
+    $query .= " AND event_type = '$eventType'";
+}
+$result = $conn->query($query);
+$eventStats = $result->fetch_assoc();
+
+// Get top 5 upcoming events for display
 $query = "SELECT e.*, m.first_name, m.last_name FROM Events e LEFT JOIN Members m ON e.member_id = m.mem_id WHERE e.date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 14 DAY)";
 if ($eventType) {
     $query .= " AND e.event_type = '$eventType'";
 }
-$query .= " ORDER BY e.date LIMIT 10";
+$query .= " ORDER BY e.date LIMIT 5";
 $result = $conn->query($query);
 $events = $result->fetch_all(MYSQLI_ASSOC);
 
@@ -105,12 +138,14 @@ $currentReport = 'events';
         <div class="upcoming-section-icon">
             <i class="fas fa-birthday-cake"></i>
         </div>
+        <div class="upcoming-stat-value"><?php echo $birthdayStats['count']; ?></div>
+        <div class="upcoming-stat-label">This Week</div>
         <?php if (count($birthdays) > 0): ?>
             <div class="upcoming-section-list">
                 <?php foreach ($birthdays as $birthday): ?>
                     <div class="upcoming-item">
                         <strong><?php echo htmlspecialchars($birthday['first_name'] . ' ' . $birthday['last_name']); ?></strong>
-                        <span><?php echo formatDate($birthday['dob']); ?></span>
+                        <span><?php echo date('M d, Y', strtotime($birthday['next_birthday'])); ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -124,12 +159,14 @@ $currentReport = 'events';
         <div class="upcoming-section-icon">
             <i class="fas fa-heart"></i>
         </div>
+        <div class="upcoming-stat-value"><?php echo $anniversaryStats['count']; ?></div>
+        <div class="upcoming-stat-label">This Week</div>
         <?php if (count($anniversaries) > 0): ?>
             <div class="upcoming-section-list">
                 <?php foreach ($anniversaries as $anniversary): ?>
                     <div class="upcoming-item">
                         <strong><?php echo htmlspecialchars($anniversary['first_name'] . ' ' . $anniversary['last_name']); ?></strong>
-                        <span><?php echo formatDate($anniversary['date_joined']); ?></span>
+                        <span><?php echo date('M d, Y', strtotime($anniversary['next_anniversary'])); ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -143,6 +180,8 @@ $currentReport = 'events';
         <div class="upcoming-section-icon">
             <i class="fas fa-calendar"></i>
         </div>
+        <div class="upcoming-stat-value"><?php echo $eventStats['count']; ?></div>
+        <div class="upcoming-stat-label">Next 14 Days</div>
         <?php if (count($events) > 0): ?>
             <div class="upcoming-section-list">
                 <?php foreach ($events as $event): ?>
@@ -159,7 +198,6 @@ $currentReport = 'events';
             <p class="upcoming-empty-message">No events scheduled for this period</p>
         <?php endif; ?>
     </div>
-</div>
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
