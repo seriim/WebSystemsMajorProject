@@ -15,7 +15,7 @@ $conn = getDBConnection();
 // Handle delete
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM Attendance WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM sunday_school_attendance WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $categoryFilter = isset($_GET['category']) ? sanitizeInput($_GET['category']) : '';
 $dateFilter = isset($_GET['date']) ? sanitizeInput($_GET['date']) : '';
 
-$query = "SELECT ssa.*, u.username as recorded_by_name FROM Attendance ssa LEFT JOIN Users u ON ssa.recorded_by = u.id WHERE 1=1";
+$query = "SELECT ssa.*, u.username as recorded_by_name FROM sunday_school_attendance ssa LEFT JOIN Users u ON ssa.recorded_by = u.id WHERE 1=1";
 
 if ($categoryFilter) {
     $query .= " AND ssa.category = '$categoryFilter'";
