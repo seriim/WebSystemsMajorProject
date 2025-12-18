@@ -95,6 +95,20 @@ CREATE TABLE IF NOT EXISTS Attendance (
   FOREIGN KEY (recorded_by) REFERENCES Users(id)
 );
 
+-- Creating the Sunday School Attendance table to track individual children's attendance
+CREATE TABLE IF NOT EXISTS sunday_school_attendance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  date DATE NOT NULL,
+  category ENUM('ages_3_under', 'ages_9_11', 'ages_12_above') NOT NULL,
+  name VARCHAR(100),
+  dob DATE,
+  next_of_kin_name VARCHAR(100),
+  next_of_kin_contact VARCHAR(20),
+  attended TINYINT(1) DEFAULT 1,
+  recorded_by INT NULL,
+  FOREIGN KEY (recorded_by) REFERENCES Users(id)
+);
+
 -- Insert default roles (INSERT IGNORE prevents duplicate key errors)
 INSERT IGNORE INTO Roles (id, role_name, description) VALUES
 (1, 'Administrator', 'Full system access'),

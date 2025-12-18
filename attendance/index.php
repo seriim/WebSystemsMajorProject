@@ -8,7 +8,7 @@ $pageSubtitle = 'Track church attendance records';
 $conn = getDBConnection();
 
 // Get recent activity counts
-$result = $conn->query("SELECT COUNT(*) as count FROM Attendance WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)");
+$result = $conn->query("SELECT COUNT(*) as count FROM sunday_school_attendance WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)");
 $recentSundaySchool = $result->fetch_assoc()['count'];
 
 $result = $conn->query("SELECT COUNT(*) as count FROM Attendance WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)");
