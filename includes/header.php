@@ -29,10 +29,31 @@ $currentPath = $_SERVER['REQUEST_URI'];
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
+                <?php if (!hasRole('Member')): ?>
                 <a href="<?php echo BASE_URL; ?>members/index.php" class="nav-item <?php echo strpos($currentPath, '/members') !== false ? 'active' : ''; ?>">
                     <i class="fas fa-users"></i>
                     <span>Members</span>
                 </a>
+                <?php else: ?>
+                <?php
+                // For Members, show link to their own profile
+                $conn = getDBConnection();
+                $username = $_SESSION['username'];
+                $stmt = $conn->prepare("SELECT mem_id FROM Members WHERE email = ? OR email LIKE ? LIMIT 1");
+                $emailPattern = "%$username%";
+                $stmt->bind_param("ss", $username, $emailPattern);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $memberProfile = $result->fetch_assoc();
+                $stmt->close();
+                closeDBConnection($conn);
+                if ($memberProfile): ?>
+                <a href="<?php echo BASE_URL; ?>members/view.php?id=<?php echo $memberProfile['mem_id']; ?>" class="nav-item <?php echo strpos($currentPath, '/members') !== false ? 'active' : ''; ?>">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+                <?php endif; ?>
+                <?php endif; ?>
                 <a href="<?php echo BASE_URL; ?>attendance/index.php" class="nav-item <?php echo strpos($currentPath, '/attendance') !== false ? 'active' : ''; ?>">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Attendance</span>

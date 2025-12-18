@@ -2,6 +2,34 @@
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
+// Restrict Members from viewing the full member list
+if (hasRole('Member')) {
+    // Members can only view their own profile - redirect to their profile if found
+    $conn = getDBConnection();
+    $username = $_SESSION['username'];
+    
+    // Try to find member by username (assuming username might match email or be similar)
+    $stmt = $conn->prepare("SELECT mem_id FROM Members WHERE email = ? OR email LIKE ? LIMIT 1");
+    $emailPattern = "%$username%";
+    $stmt->bind_param("ss", $username, $emailPattern);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        $member = $result->fetch_assoc();
+        $stmt->close();
+        closeDBConnection($conn);
+        header('Location: ' . BASE_URL . 'members/view.php?id=' . $member['mem_id']);
+        exit();
+    } else {
+        $stmt->close();
+        closeDBConnection($conn);
+        // If no member found, redirect to dashboard
+        header('Location: ' . BASE_URL . 'index.php');
+        exit();
+    }
+}
+
 $pageTitle = 'Members';
 $pageSubtitle = 'Manage church membership records';
 

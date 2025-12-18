@@ -25,6 +25,22 @@ if ($result->num_rows === 0) {
 
 $member = $result->fetch_assoc();
 $stmt->close();
+
+// If user is a Member, restrict them to only viewing their own profile
+if (hasRole('Member')) {
+    $username = $_SESSION['username'];
+    // Check if the member's email matches the user's username or if username is in email
+    $memberEmail = $member['email'] ?? '';
+    if (empty($memberEmail) || 
+        (strtolower($memberEmail) !== strtolower($username) && 
+         strpos(strtolower($memberEmail), strtolower($username)) === false)) {
+        // Member trying to view someone else's profile - redirect to dashboard
+        closeDBConnection($conn);
+        header('Location: ' . BASE_URL . 'index.php');
+        exit();
+    }
+}
+
 closeDBConnection($conn);
 
 include __DIR__ . '/../includes/header.php';
