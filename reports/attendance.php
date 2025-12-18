@@ -69,6 +69,12 @@ $currentReport = 'attendance';
             <h3 class="card-title">Attendance Reports</h3>
             <p class="card-subtitle">Monthly attendance summary and trends</p>
         </div>
+        <div>
+            <a href="<?php echo BASE_URL; ?>reports/export_pdf.php?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>" 
+               class="btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
     </div>
     
     <form method="GET" action="" class="mb-4" style="background: var(--pastel-blue-lighter); padding: 20px; border-radius: 8px;">

@@ -132,6 +132,21 @@ $currentReport = 'events';
     </a>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header">
+        <div>
+            <h3 class="card-title">Events & Milestones Reports</h3>
+            <p class="card-subtitle">View upcoming birthdays, anniversaries, and events</p>
+        </div>
+        <div>
+            <a href="<?php echo BASE_URL; ?>reports/export_pdf.php?type=events" 
+               class="btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="upcoming-sections">
     <div class="upcoming-section-card">
         <h3 class="upcoming-section-title">Upcoming Birthdays</h3>
@@ -157,7 +172,7 @@ $currentReport = 'events';
     <div class="upcoming-section-card">
         <h3 class="upcoming-section-title">Upcoming Anniversaries</h3>
         <div class="upcoming-section-icon">
-            <i class="fas fa-heart"></i>
+            <i class="fas fa-heart" style="font-weight: 900;"></i>
         </div>
         <div class="upcoming-stat-value"><?php echo $anniversaryStats['count']; ?></div>
         <div class="upcoming-stat-label">This Week</div>
@@ -178,7 +193,7 @@ $currentReport = 'events';
     <div class="upcoming-section-card">
         <h3 class="upcoming-section-title">Upcoming Events</h3>
         <div class="upcoming-section-icon">
-            <i class="fas fa-calendar"></i>
+            <i class="fas fa-calendar" style="font-weight: 900;"></i>
         </div>
         <div class="upcoming-stat-value"><?php echo $eventStats['count']; ?></div>
         <div class="upcoming-stat-label">Next 14 Days</div>

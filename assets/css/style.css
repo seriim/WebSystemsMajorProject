@@ -1591,16 +1591,20 @@ body {
 }
 
 .upcoming-section-icon {
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 60px;
     margin: 0 auto 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--pastel-blue-light) 0%, var(--pastel-blue-lighter) 100%);
-    border-radius: 50%;
-    color: var(--blue-primary);
-    font-size: 28px;
+    background: rgba(168, 213, 226, 0.25); /* Light blue oval background */
+    border-radius: 50%; /* Oval/ellipse shape */
+    color: #4A90E2; /* Solid blue color */
+    font-size: 36px;
+}
+
+.upcoming-section-icon i {
+    font-weight: 900; /* Make icons solid/filled */
 }
 
 .upcoming-section-list {

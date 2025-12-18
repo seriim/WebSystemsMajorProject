@@ -91,6 +91,12 @@ $currentReport = 'membership';
             <h3 class="card-title">Membership Reports</h3>
             <p class="card-subtitle">View membership statistics and details</p>
         </div>
+        <div>
+            <a href="<?php echo BASE_URL; ?>reports/export_pdf.php?type=membership<?php echo $statusFilter ? '&status=' . urlencode($statusFilter) : ''; ?><?php echo $genderFilter ? '&gender=' . urlencode($genderFilter) : ''; ?>" 
+               class="btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
     </div>
     
     <form method="GET" action="" class="mb-4" style="background: var(--pastel-blue-light); padding: 20px; border-radius: 8px;">

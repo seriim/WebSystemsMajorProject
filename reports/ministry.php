@@ -78,6 +78,12 @@ $currentReport = 'milestones';
             <h3 class="card-title">Ministry Participation Reports</h3>
             <p class="card-subtitle">View ministry participation and attendance statistics</p>
         </div>
+        <div>
+            <a href="<?php echo BASE_URL; ?>reports/export_pdf.php?type=ministry" 
+               class="btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
     </div>
     
     <form method="GET" action="" class="mb-4" style="background: var(--pastel-blue-lighter); padding: 20px; border-radius: 8px;">

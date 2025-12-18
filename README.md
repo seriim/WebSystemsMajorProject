@@ -58,7 +58,7 @@ The system implements role-based access control with the following roles:
 - **Clerk**: Administrative tasks
 - **Member**: Basic read-only access
 
-See `ROLE_BASED_ACCESS.md` for detailed access control documentation.
+For detailed access control information, see the User Manual.
 
 ## Database Schema
 
@@ -69,9 +69,26 @@ The database includes the following tables:
 - `Ministries` - Ministry groups
 - `Ministry_Members` - Member-ministry relationships
 - `Events` - Church events and milestones
-- `Attendance` - Attendance records
+- `Attendance` - Attendance records (ministry meetings)
+- `sunday_school_attendance` - Children's Sunday School attendance
+- `vestry_hours` - Minister's vestry appointments
+- `church_service_attendance` - Church service attendance
 
 
+
+## Documentation
+
+Complete project documentation is available in:
+
+- **CMIS_Complete_Documentation.docx** - Comprehensive documentation including:
+  - Project Overview
+  - User Manual (complete guide for all features)
+  - Testing & Evaluation Report (test cases, results, and evaluation)
+  - Presentation Outline (system design, database structure, implementation challenges)
+  - Documentation Index
+
+**Database Diagram:**
+- **[DATABASE_ERD.drawio](DATABASE_ERD.drawio)** - Entity Relationship Diagram (open with draw.io)
 
 ## Authors
 

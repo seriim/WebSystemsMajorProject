@@ -86,10 +86,16 @@ if ($currentPage === 'membership.php') $currentReport = 'membership';
                     <h3 class="card-title">Members by Ministry</h3>
                     <p class="card-subtitle">Distribution across ministries</p>
                 </div>
-                <a href="<?php echo BASE_URL; ?>reports/membership.php" class="btn btn-primary btn-sm">
-                    <i class="fas fa-external-link-alt"></i>
-                    View Full Report
-                </a>
+                <div>
+                    <a href="<?php echo BASE_URL; ?>reports/membership.php" class="btn btn-primary btn-sm">
+                        <i class="fas fa-external-link-alt"></i>
+                        View Full Report
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>reports/export_pdf.php?type=membership" 
+                       class="btn btn-primary btn-sm" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
             </div>
             
             <?php if (count($membersByMinistry) > 0): ?>
