@@ -1120,6 +1120,16 @@ body {
     justify-content: flex-end;
 }
 
+/* Center action button when it's the only one */
+.table td:last-child .action-buttons:has(:only-child) {
+    justify-content: center;
+}
+
+/* Fallback for browsers that don't support :has() */
+.table td:last-child .action-buttons > *:only-child {
+    margin: 0 auto;
+}
+
 .table tbody tr:hover {
     background: var(--pastel-blue-lighter);
 }
