@@ -126,31 +126,31 @@ include __DIR__ . '/../includes/header.php';
                 
                 <div class="form-group">
                     <label class="form-label">First Name *</label>
-                    <input type="text" class="form-control" name="first_name" value="<?php echo htmlspecialchars($member['first_name']); ?>" required>
+                    <input type="text" class="form-control" name="first_name" value="<?php echo htmlspecialchars($member['first_name'] ?? ''); ?>" required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Middle Initials</label>
-                    <input type="text" class="form-control" name="middle_initials" value="<?php echo htmlspecialchars($member['middle_initials']); ?>" maxlength="10">
+                    <input type="text" class="form-control" name="middle_initials" value="<?php echo htmlspecialchars($member['middle_initials'] ?? ''); ?>" maxlength="10">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Last Name *</label>
-                    <input type="text" class="form-control" name="last_name" value="<?php echo htmlspecialchars($member['last_name']); ?>" required>
+                    <input type="text" class="form-control" name="last_name" value="<?php echo htmlspecialchars($member['last_name'] ?? ''); ?>" required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" name="dob" value="<?php echo $member['dob']; ?>">
+                    <input type="date" class="form-control" name="dob" value="<?php echo htmlspecialchars($member['dob'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Gender</label>
                     <select class="form-select" name="gender">
                         <option value="">Select...</option>
-                        <option value="Male" <?php echo $member['gender'] === 'Male' ? 'selected' : ''; ?>>Male</option>
-                        <option value="Female" <?php echo $member['gender'] === 'Female' ? 'selected' : ''; ?>>Female</option>
-                        <option value="Other" <?php echo $member['gender'] === 'Other' ? 'selected' : ''; ?>>Other</option>
+                        <option value="Male" <?php echo ($member['gender'] ?? '') === 'Male' ? 'selected' : ''; ?>>Male</option>
+                        <option value="Female" <?php echo ($member['gender'] ?? '') === 'Female' ? 'selected' : ''; ?>>Female</option>
+                        <option value="Other" <?php echo ($member['gender'] ?? '') === 'Other' ? 'selected' : ''; ?>>Other</option>
                     </select>
                 </div>
                 
@@ -161,37 +161,37 @@ include __DIR__ . '/../includes/header.php';
                 
                 <div class="form-group">
                     <label class="form-label">Home Address 1</label>
-                    <input type="text" class="form-control" name="home_address1" value="<?php echo htmlspecialchars($member['home_address1']); ?>">
+                    <input type="text" class="form-control" name="home_address1" value="<?php echo htmlspecialchars($member['home_address1'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Home Address 2</label>
-                    <input type="text" class="form-control" name="home_address2" value="<?php echo htmlspecialchars($member['home_address2']); ?>">
+                    <input type="text" class="form-control" name="home_address2" value="<?php echo htmlspecialchars($member['home_address2'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Town</label>
-                    <input type="text" class="form-control" name="town" value="<?php echo htmlspecialchars($member['town']); ?>">
+                    <input type="text" class="form-control" name="town" value="<?php echo htmlspecialchars($member['town'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Parish</label>
-                    <input type="text" class="form-control" name="parish" value="<?php echo htmlspecialchars($member['parish']); ?>">
+                    <input type="text" class="form-control" name="parish" value="<?php echo htmlspecialchars($member['parish'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Home Phone</label>
-                    <input type="tel" class="form-control" name="contact_home" value="<?php echo htmlspecialchars($member['contact_home'] ?: ''); ?>">
+                    <input type="tel" class="form-control" name="contact_home" value="<?php echo htmlspecialchars($member['contact_home'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Work Phone</label>
-                    <input type="tel" class="form-control" name="contact_work" value="<?php echo htmlspecialchars($member['contact_work'] ?: ''); ?>">
+                    <input type="tel" class="form-control" name="contact_work" value="<?php echo htmlspecialchars($member['contact_work'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($member['email']); ?>">
+                    <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($member['email'] ?? ''); ?>">
                 </div>
             </div>
         </div>
@@ -202,27 +202,27 @@ include __DIR__ . '/../includes/header.php';
                 
                 <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input type="text" class="form-control" name="next_of_kin_name" value="<?php echo htmlspecialchars($member['next_of_kin_name']); ?>">
+                    <input type="text" class="form-control" name="next_of_kin_name" value="<?php echo htmlspecialchars($member['next_of_kin_name'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Address</label>
-                    <input type="text" class="form-control" name="next_of_kin_address" value="<?php echo htmlspecialchars($member['next_of_kin_address']); ?>">
+                    <input type="text" class="form-control" name="next_of_kin_address" value="<?php echo htmlspecialchars($member['next_of_kin_address'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Relation</label>
-                    <input type="text" class="form-control" name="next_of_kin_relation" value="<?php echo htmlspecialchars($member['next_of_kin_relation']); ?>">
+                    <input type="text" class="form-control" name="next_of_kin_relation" value="<?php echo htmlspecialchars($member['next_of_kin_relation'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Contact Number</label>
-                    <input type="tel" class="form-control" name="next_of_kin_contact" value="<?php echo htmlspecialchars($member['next_of_kin_contact']); ?>">
+                    <input type="tel" class="form-control" name="next_of_kin_contact" value="<?php echo htmlspecialchars($member['next_of_kin_contact'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="next_of_kin_email" value="<?php echo htmlspecialchars($member['next_of_kin_email']); ?>">
+                    <input type="email" class="form-control" name="next_of_kin_email" value="<?php echo htmlspecialchars($member['next_of_kin_email'] ?? ''); ?>">
                 </div>
             </div>
             
@@ -235,15 +235,15 @@ include __DIR__ . '/../includes/header.php';
                 <div class="form-group">
                     <label class="form-label">Status *</label>
                     <select class="form-select" name="status" required>
-                        <option value="Visitor" <?php echo $member['status'] === 'Visitor' ? 'selected' : ''; ?>>Visitor</option>
-                        <option value="Adherent" <?php echo $member['status'] === 'Adherent' ? 'selected' : ''; ?>>Adherent</option>
-                        <option value="Member" <?php echo $member['status'] === 'Member' ? 'selected' : ''; ?>>Member</option>
+                        <option value="Visitor" <?php echo ($member['status'] ?? '') === 'Visitor' ? 'selected' : ''; ?>>Visitor</option>
+                        <option value="Adherent" <?php echo ($member['status'] ?? '') === 'Adherent' ? 'selected' : ''; ?>>Adherent</option>
+                        <option value="Member" <?php echo ($member['status'] ?? '') === 'Member' ? 'selected' : ''; ?>>Member</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Date Joined</label>
-                    <input type="date" class="form-control" name="date_joined" value="<?php echo $member['date_joined']; ?>">
+                    <input type="date" class="form-control" name="date_joined" value="<?php echo htmlspecialchars($member['date_joined'] ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">

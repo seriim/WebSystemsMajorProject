@@ -33,7 +33,7 @@ include __DIR__ . '/../includes/header.php';
 <div class="card">
     <div class="card-header">
         <div>
-            <h3 class="card-title"><?php echo htmlspecialchars($member['first_name'] . ' ' . ($member['middle_initials'] ? $member['middle_initials'] . ' ' : '') . $member['last_name']); ?></h3>
+            <h3 class="card-title"><?php echo htmlspecialchars(($member['first_name'] ?? '') . ' ' . (($member['middle_initials'] ?? '') ? ($member['middle_initials'] . ' ') : '') . ($member['last_name'] ?? '')); ?></h3>
             <p class="card-subtitle">Member ID: <?php echo $member['mem_id']; ?></p>
         </div>
         <div>
@@ -55,15 +55,15 @@ include __DIR__ . '/../includes/header.php';
             <table class="table">
                 <tr>
                     <th width="40%">Full Name</th>
-                    <td><?php echo htmlspecialchars($member['first_name'] . ' ' . ($member['middle_initials'] ? $member['middle_initials'] . ' ' : '') . $member['last_name']); ?></td>
+                    <td><?php echo htmlspecialchars(($member['first_name'] ?? '') . ' ' . (($member['middle_initials'] ?? '') ? ($member['middle_initials'] . ' ') : '') . ($member['last_name'] ?? '')); ?></td>
                 </tr>
                 <tr>
                     <th>Date of Birth</th>
-                    <td><?php echo formatDate($member['dob']); ?></td>
+                    <td><?php echo formatDate($member['dob'] ?? null); ?></td>
                 </tr>
                 <tr>
                     <th>Gender</th>
-                    <td><?php echo htmlspecialchars($member['gender'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['gender'] ?? '-'); ?></td>
                 </tr>
             </table>
         </div>
@@ -73,27 +73,27 @@ include __DIR__ . '/../includes/header.php';
             <table class="table">
                 <tr>
                     <th width="40%">Home Address</th>
-                    <td><?php echo htmlspecialchars(trim(($member['home_address1'] ?: '') . ' ' . ($member['home_address2'] ?: '')) ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars(trim((($member['home_address1'] ?? '') . ' ' . ($member['home_address2'] ?? ''))) ?: '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Town</th>
-                    <td><?php echo htmlspecialchars($member['town'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['town'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Parish</th>
-                    <td><?php echo htmlspecialchars($member['parish'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['parish'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Home Phone</th>
-                    <td><?php echo htmlspecialchars($member['contact_home'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['contact_home'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Work Phone</th>
-                    <td><?php echo htmlspecialchars($member['contact_work'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['contact_work'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td><?php echo htmlspecialchars($member['email'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['email'] ?? '-'); ?></td>
                 </tr>
             </table>
         </div>
@@ -105,23 +105,23 @@ include __DIR__ . '/../includes/header.php';
             <table class="table">
                 <tr>
                     <th width="40%">Name</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_name'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['next_of_kin_name'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Address</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_address'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['next_of_kin_address'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Relation</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_relation'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['next_of_kin_relation'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Contact</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_contact'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['next_of_kin_contact'] ?? '-'); ?></td>
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_email'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['next_of_kin_email'] ?? '-'); ?></td>
                 </tr>
             </table>
         </div>
@@ -131,23 +131,23 @@ include __DIR__ . '/../includes/header.php';
             <table class="table">
                 <tr>
                     <th width="40%">Status</th>
-                    <td><span class="badge badge-success"><?php echo ucfirst($member['status']); ?></span></td>
+                    <td><span class="badge badge-success"><?php echo ucfirst($member['status'] ?? 'Visitor'); ?></span></td>
                 </tr>
                 <tr>
                     <th>Date Joined</th>
-                    <td><?php echo formatDate($member['date_joined']); ?></td>
+                    <td><?php echo formatDate($member['date_joined'] ?? null); ?></td>
                 </tr>
                 <tr>
                     <th>Ministries</th>
-                    <td><?php echo htmlspecialchars($member['ministries'] ?: '-'); ?></td>
+                    <td><?php echo htmlspecialchars($member['ministries'] ?? '-'); ?></td>
                 </tr>
-                <?php if ($member['min_id']): ?>
+                <?php if (!empty($member['min_id'])): ?>
                 <tr>
                     <th>Ministry ID</th>
                     <td><?php echo htmlspecialchars($member['min_id']); ?></td>
                 </tr>
                 <?php endif; ?>
-                <?php if ($member['passing_date']): ?>
+                <?php if (!empty($member['passing_date'])): ?>
                 <tr>
                     <th>Passing Date</th>
                     <td><?php echo formatDate($member['passing_date']); ?></td>
