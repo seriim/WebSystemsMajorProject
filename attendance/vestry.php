@@ -15,7 +15,7 @@ $conn = getDBConnection();
 // Handle delete
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM Attendance WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM vestry_hours WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
@@ -56,12 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get records
 $dateFilter = isset($_GET['date']) ? sanitizeInput($_GET['date']) : '';
-$query = "SELECT vh.*, u.username as recorded_by_name FROM Attendance vh LEFT JOIN Users u ON vh.recorded_by = u.id WHERE 1=1";
+$query = "SELECT vh.*, u.username as recorded_by_name FROM vestry_hours vh LEFT JOIN Users u ON vh.recorded_by = u.id WHERE 1=1";
 if ($dateFilter) {
     $query .= " AND vh.date = '$dateFilter'";
 }
 $query .= " ORDER BY vh.date DESC, vh.time_of_visit DESC LIMIT 100";
 $result = $conn->query($query);
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 $records = $result->fetch_all(MYSQLI_ASSOC);
 
 closeDBConnection($conn);

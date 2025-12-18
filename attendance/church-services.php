@@ -15,7 +15,7 @@ $conn = getDBConnection();
 // Handle delete
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM Attendance WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM church_service_attendance WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
@@ -52,12 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get records
 $dateFilter = isset($_GET['date']) ? sanitizeInput($_GET['date']) : '';
-$query = "SELECT csa.*, u.username as recorded_by_name FROM Attendance csa LEFT JOIN Users u ON csa.recorded_by = u.id WHERE 1=1";
+$query = "SELECT csa.*, u.username as recorded_by_name FROM church_service_attendance csa LEFT JOIN Users u ON csa.recorded_by = u.id WHERE 1=1";
 if ($dateFilter) {
     $query .= " AND csa.date = '$dateFilter'";
 }
 $query .= " ORDER BY csa.date DESC LIMIT 100";
 $result = $conn->query($query);
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 $records = $result->fetch_all(MYSQLI_ASSOC);
 
 closeDBConnection($conn);
