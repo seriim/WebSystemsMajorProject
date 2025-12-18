@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $middle_initials = sanitizeInput($_POST['middle_initials']);
     $last_name = sanitizeInput($_POST['last_name']);
     $dob = !empty($_POST['dob']) ? $_POST['dob'] : null;
-    $gender = sanitizeInput($_POST['gender']);
+    $gender = !empty(trim($_POST['gender'])) ? sanitizeInput($_POST['gender']) : null;
     $home_address1 = sanitizeInput($_POST['home_address1']);
     $home_address2 = sanitizeInput($_POST['home_address2']);
     $town = sanitizeInput($_POST['town']);
