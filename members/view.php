@@ -51,109 +51,113 @@ include __DIR__ . '/../includes/header.php';
     
     <div class="row">
         <div class="col-md-6">
-            <h5 class="mb-3">Personal Information</h5>
-            <table class="table">
-                <tr>
-                    <th width="40%">Full Name</th>
-                    <td><?php echo htmlspecialchars(($member['first_name'] ?? '') . ' ' . (($member['middle_initials'] ?? '') ? ($member['middle_initials'] . ' ') : '') . ($member['last_name'] ?? '')); ?></td>
-                </tr>
-                <tr>
-                    <th>Date of Birth</th>
-                    <td><?php echo formatDate($member['dob'] ?? null); ?></td>
-                </tr>
-                <tr>
-                    <th>Gender</th>
-                    <td><?php echo htmlspecialchars($member['gender'] ?? '-'); ?></td>
-                </tr>
-            </table>
+            <h5 class="info-section-title">Personal Information</h5>
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value"><?php echo htmlspecialchars(($member['first_name'] ?? '') . ' ' . (($member['middle_initials'] ?? '') ? ($member['middle_initials'] . ' ') : '') . ($member['last_name'] ?? '')); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value"><?php echo formatDate($member['dob'] ?? null); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['gender'] ?? '-'); ?></span>
+                </div>
+            </div>
         </div>
         
         <div class="col-md-6">
-            <h5 class="mb-3">Contact Information</h5>
-            <table class="table">
-                <tr>
-                    <th width="40%">Home Address</th>
-                    <td><?php echo htmlspecialchars(trim((($member['home_address1'] ?? '') . ' ' . ($member['home_address2'] ?? ''))) ?: '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Town</th>
-                    <td><?php echo htmlspecialchars($member['town'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Parish</th>
-                    <td><?php echo htmlspecialchars($member['parish'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Home Phone</th>
-                    <td><?php echo htmlspecialchars($member['contact_home'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Work Phone</th>
-                    <td><?php echo htmlspecialchars($member['contact_work'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td><?php echo htmlspecialchars($member['email'] ?? '-'); ?></td>
-                </tr>
-            </table>
+            <h5 class="info-section-title">Contact Information</h5>
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Home Address</span>
+                    <span class="info-value"><?php echo htmlspecialchars(trim((($member['home_address1'] ?? '') . ' ' . ($member['home_address2'] ?? ''))) ?: '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Town</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['town'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Parish</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['parish'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Home Phone</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['contact_home'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Work Phone</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['contact_work'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['email'] ?? '-'); ?></span>
+                </div>
+            </div>
         </div>
     </div>
     
-    <div class="row mt-3">
+    <div class="row mt-4">
         <div class="col-md-6">
-            <h5 class="mb-3">Next of Kin</h5>
-            <table class="table">
-                <tr>
-                    <th width="40%">Name</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_name'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Address</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_address'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Relation</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_relation'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Contact</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_contact'] ?? '-'); ?></td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td><?php echo htmlspecialchars($member['next_of_kin_email'] ?? '-'); ?></td>
-                </tr>
-            </table>
+            <h5 class="info-section-title">Next of Kin</h5>
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['next_of_kin_name'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Address</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['next_of_kin_address'] ?? '-'); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Relation</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['next_of_kin_relation'] ?? '-'); ?></span>
+                </div>
+                <?php if (!empty($member['next_of_kin_contact'])): ?>
+                <div class="info-row">
+                    <span class="info-label">Contact</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['next_of_kin_contact']); ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($member['next_of_kin_email'])): ?>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['next_of_kin_email']); ?></span>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
         
         <div class="col-md-6">
-            <h5 class="mb-3">Church Information</h5>
-            <table class="table">
-                <tr>
-                    <th width="40%">Status</th>
-                    <td><span class="badge badge-success"><?php echo ucfirst($member['status'] ?? 'Visitor'); ?></span></td>
-                </tr>
-                <tr>
-                    <th>Date Joined</th>
-                    <td><?php echo formatDate($member['date_joined'] ?? null); ?></td>
-                </tr>
-                <tr>
-                    <th>Ministries</th>
-                    <td><?php echo htmlspecialchars($member['ministries'] ?? '-'); ?></td>
-                </tr>
+            <h5 class="info-section-title">Church Information</h5>
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value"><span class="badge badge-status"><?php echo ucfirst($member['status'] ?? 'Visitor'); ?></span></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date Joined</span>
+                    <span class="info-value"><?php echo formatDate($member['date_joined'] ?? null); ?></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ministries</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['ministries'] ?? '-'); ?></span>
+                </div>
                 <?php if (!empty($member['min_id'])): ?>
-                <tr>
-                    <th>Ministry ID</th>
-                    <td><?php echo htmlspecialchars($member['min_id']); ?></td>
-                </tr>
+                <div class="info-row">
+                    <span class="info-label">Ministry ID</span>
+                    <span class="info-value"><?php echo htmlspecialchars($member['min_id']); ?></span>
+                </div>
                 <?php endif; ?>
                 <?php if (!empty($member['passing_date'])): ?>
-                <tr>
-                    <th>Passing Date</th>
-                    <td><?php echo formatDate($member['passing_date']); ?></td>
-                </tr>
+                <div class="info-row">
+                    <span class="info-label">Passing Date</span>
+                    <span class="info-value"><?php echo formatDate($member['passing_date']); ?></span>
+                </div>
                 <?php endif; ?>
-            </table>
+            </div>
         </div>
     </div>
     
