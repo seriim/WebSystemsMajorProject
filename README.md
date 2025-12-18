@@ -33,6 +33,8 @@ A comprehensive web-based church management system built with PHP, MySQL, JavaSc
    mysql -u root < database/dummy_data.sql
    mysql -u root < database/dashboard_data.sql
    ```
+   
+   **Optional**: For reference SQL queries and reports, see `database/reports_queries.sql`
 
 3. **Configuration**:
    - Update `config/database.php` if needed (default uses XAMPP settings)
