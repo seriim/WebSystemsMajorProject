@@ -92,6 +92,14 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 </div>
 
+<?php if (isset($_GET['deleted'])): ?>
+    <div class="alert alert-success">Event deleted successfully.</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+<?php endif; ?>
+
 <div class="row">
     <div class="col-md-6">
         <div class="card">
