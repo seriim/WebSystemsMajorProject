@@ -5,6 +5,12 @@
  * 
  * This script exports the database to a SQL file for backup purposes.
  * Run this script via web browser or command line.
+ * 
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
  */
 
 require_once __DIR__ . '/config/config.php';

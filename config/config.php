@@ -1,4 +1,11 @@
 <?php
+/**
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
+ */
 // Application configuration
 session_start();
 

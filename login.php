@@ -1,4 +1,11 @@
 <?php
+/**
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
+ */
 require_once __DIR__ . '/config/config.php';
 
 // Redirect if already logged in
@@ -25,9 +32,6 @@ require_once __DIR__ . '/includes/auth.php';
         <!-- Left Section - Blue Gradient -->
         <div class="login-left">
             <div class="login-left-content">
-                <div class="logo-icon">
-                    <i class="fas fa-church"></i>
-                </div>
             </div>
             <!-- Cloud-like wavy divider -->
             <svg class="wavy-divider" viewBox="0 0 200 1500" preserveAspectRatio="none">

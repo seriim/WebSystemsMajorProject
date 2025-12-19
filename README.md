@@ -33,18 +33,33 @@ A comprehensive web-based church management system built with PHP, MySQL, JavaSc
    mysql -u root < database/dummy_data.sql
    mysql -u root < database/dashboard_data.sql
    ```
-   
-   **Optional**: For reference SQL queries and reports, see `database/reports_queries.sql`
 
 3. **Configuration**:
    - Update `config/database.php` if needed (default uses XAMPP settings)
-   - Default admin credentials:
-     - Username: `admin`
-     - Password: `admin123`
 
 4. **Access**:
    - Navigate to `http://localhost/labs/MajorProjectFinal/`
-   - Login with admin credentials
+   - Login with one of the demo credentials below
+
+## Demo Login Credentials
+
+### Administrator Accounts
+- **Username:** `admin` | **Password:** `admin123`
+- **Username:** `test_admin` | **Password:** `test123`
+
+### Pastor Account
+- **Username:** `test_pastor` | **Password:** `test123`
+
+### Ministry Leader Account
+- **Username:** `test_leader` | **Password:** `test123`
+
+### Clerk Account
+- **Username:** `test_clerk` | **Password:** `test123`
+
+### Member Account
+- **Username:** `test_member` | **Password:** `test123`
+
+**Note:** Test users (`test_*`) are created when you import the database schema. Use these accounts to test different role-based access levels.
 
 
 
@@ -74,21 +89,6 @@ The database includes the following tables:
 - `vestry_hours` - Minister's vestry appointments
 - `church_service_attendance` - Church service attendance
 
-
-
-## Documentation
-
-Complete project documentation is available in:
-
-- **CMIS_Complete_Documentation.docx** - Comprehensive documentation including:
-  - Project Overview
-  - User Manual (complete guide for all features)
-  - Testing & Evaluation Report (test cases, results, and evaluation)
-  - Presentation Outline (system design, database structure, implementation challenges)
-  - Documentation Index
-
-**Database Diagram:**
-- **[DATABASE_ERD.drawio](DATABASE_ERD.drawio)** - Entity Relationship Diagram (open with draw.io)
 
 ## Authors
 

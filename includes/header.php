@@ -1,4 +1,11 @@
 <?php
+/**
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
+ */
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
@@ -90,9 +97,6 @@ $currentPath = $_SERVER['REQUEST_URI'];
         <main class="main-content">
             <div class="top-header">
                 <div class="header-left">
-                    <div class="header-icon">
-                        <i class="fas fa-church"></i>
-                    </div>
                     <div class="header-title">
                         <h1><?php echo isset($pageTitle) ? $pageTitle : 'Dashboard'; ?></h1>
                         <p><?php echo isset($pageSubtitle) ? $pageSubtitle : 'Overview of your church community'; ?></p>

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
+ */
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
@@ -193,7 +200,7 @@ $currentReport = 'events';
     <div class="upcoming-section-card">
         <h3 class="upcoming-section-title">Upcoming Events</h3>
         <div class="upcoming-section-icon">
-            <i class="fas fa-calendar" style="font-weight: 900;"></i>
+            <i class="fas fa-calendar-alt"></i>
         </div>
         <div class="upcoming-stat-value"><?php echo $eventStats['count']; ?></div>
         <div class="upcoming-stat-label">Next 14 Days</div>

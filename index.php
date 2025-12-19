@@ -1,4 +1,11 @@
 <?php
+/**
+ * Authors:
+ * - Joshane Beecher (2304845)
+ * - Abbygayle Higgins (2106327)
+ * - Serena Morris (2208659)
+ * - Jahzeal Simms (2202446)
+ */
 require_once __DIR__ . '/config/config.php';
 requireLogin();
 
@@ -29,16 +36,40 @@ $stats['special_needs'] = 0;
 $result = $conn->query("SELECT COUNT(*) as count FROM Ministries");
 $stats['active_ministries'] = $result->fetch_assoc()['count'];
 
-// Attendance trends (last 4 weeks)
+// Attendance trends (last 4 weeks) - get weekly totals
 $attendanceTrends = [];
-for ($i = 3; $i >= 0; $i--) {
-    $date = date('Y-m-d', strtotime("-$i weeks monday"));
-    $result = $conn->query("SELECT SUM(count) as total FROM Attendance WHERE date = '$date'");
-    $row = $result->fetch_assoc();
-    $attendanceTrends[] = [
-        'date' => date('M d', strtotime($date)),
-        'total' => $row['total'] ?? 0
-    ];
+$result = $conn->query("
+    SELECT 
+        DATE_FORMAT(date, '%Y-%u') as week,
+        DATE_FORMAT(MIN(date), '%M %d') as week_start,
+        SUM(count) as total
+    FROM Attendance 
+    WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL 4 WEEK)
+    GROUP BY DATE_FORMAT(date, '%Y-%u')
+    ORDER BY week DESC
+    LIMIT 4
+");
+$weeklyData = $result->fetch_all(MYSQLI_ASSOC);
+
+// Reverse to show oldest to newest
+$weeklyData = array_reverse($weeklyData);
+
+if (count($weeklyData) > 0) {
+    foreach ($weeklyData as $week) {
+        $attendanceTrends[] = [
+            'date' => $week['week_start'],
+            'total' => intval($week['total'] ?? 0)
+        ];
+    }
+} else {
+    // If no data, show empty weeks
+    for ($i = 3; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-$i weeks monday"));
+        $attendanceTrends[] = [
+            'date' => date('M d', strtotime($date)),
+            'total' => 0
+        ];
+    }
 }
 
 // Upcoming birthdays (next 2 weeks)
@@ -131,10 +162,12 @@ include __DIR__ . '/includes/header.php';
             <div class="card-header">
                 <div>
                     <h3 class="card-title">Attendance Trends</h3>
-                    <p class="card-subtitle">Last 4 weeks attendance</p>
+                    <p class="card-subtitle">Weekly total attendance (last 4 weeks)</p>
                 </div>
             </div>
-            <canvas id="attendanceChart" height="100"></canvas>
+            <div style="position: relative; height: 300px; padding: 20px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
         </div>
     </div>
     
@@ -193,55 +226,101 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <script>
-// Attendance Chart
-const ctx = document.getElementById('attendanceChart').getContext('2d');
-const attendanceChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode(array_column($attendanceTrends, 'date')); ?>,
-        datasets: [{
-            label: 'Attendance',
-            data: <?php echo json_encode(array_column($attendanceTrends, 'total')); ?>,
-            borderColor: '#4A90E2',
-            backgroundColor: 'rgba(74, 144, 226, 0.08)',
-            borderWidth: 2,
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                },
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
-                }
+// Attendance Chart - Wait for DOM and Chart.js to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('attendanceChart');
+    if (!canvas) {
+        console.error('Attendance chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for chart');
+        return;
+    }
+    
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js library not loaded');
+        return;
+    }
+    
+    const attendanceData = <?php echo json_encode(array_column($attendanceTrends, 'total')); ?>;
+    const attendanceLabels = <?php echo json_encode(array_column($attendanceTrends, 'date')); ?>;
+    
+    // Only create chart if we have data
+    if (attendanceData.length > 0) {
+        const attendanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: attendanceLabels,
+                datasets: [{
+                    label: 'Attendance',
+                    data: attendanceData,
+                    borderColor: '#4A90E2',
+                    backgroundColor: 'rgba(74, 144, 226, 0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
             },
-            x: {
-                grid: {
-                    display: false
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Total Attendance: ' + context.parsed.y + ' people';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Attendance Count'
+                        },
+                        ticks: {
+                            stepSize: 50,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Week Starting'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6,
+                        backgroundColor: '#4A90E2',
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }
                 }
             }
-        },
-        elements: {
-            point: {
-                radius: 4,
-                hoverRadius: 6,
-                backgroundColor: '#4A90E2',
-                borderColor: '#fff',
-                borderWidth: 2
-            }
-        }
+        });
+    } else {
+        // Show message if no data
+        canvas.parentElement.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><h3>No attendance data available</h3><p>Attendance records will appear here once data is added.</p></div>';
     }
 });
 </script>
