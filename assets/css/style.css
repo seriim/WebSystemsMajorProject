@@ -621,7 +621,7 @@ body {
     background: var(--white);
     border-radius: 16px;
     padding: 32px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
@@ -636,7 +636,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-medium);
 }
 
 .card-title {
@@ -903,15 +905,21 @@ body {
 
 .attendance-filter-form {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .attendance-filter-form .form-select,
 .attendance-filter-form .form-control {
-    min-width: 150px;
+    min-width: 180px;
+    max-width: 200px;
     flex: 0 0 auto;
+}
+
+.attendance-filter-form .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .attendance-form {
@@ -1032,6 +1040,15 @@ body {
     border-bottom: 1px solid var(--gray-medium);
 }
 
+.table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 14px;
+    border-bottom: 1px solid var(--gray-medium);
+}
+
 .table td {
     padding: 16px;
     border-bottom: 1px solid var(--gray-medium);
@@ -1039,36 +1056,113 @@ body {
     word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: break-word;
-    vertical-align: top;
+    vertical-align: middle;
+    text-align: left;
     max-width: 250px;
 }
 
+/* First column (usually Name/Text) - always left-aligned */
 .table td:first-child {
     min-width: 180px;
     max-width: 250px;
+    text-align: left !important;
 }
 
+.table th:first-child {
+    text-align: left !important;
+}
+
+/* Second column - center if it contains badge/number, otherwise left */
 .table td:nth-child(2) {
     min-width: 200px;
     max-width: 250px;
+    text-align: center !important; /* Default to center for numeric columns */
 }
 
-.table td > div {
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+/* Override: Keep 2nd column left if it's text (like Description) - no badge, no number-only */
+.table td:nth-child(2):not(:has(.badge)):not(:has(strong:only-child)) {
+    text-align: left !important;
 }
 
+/* If 2nd column is left, its header should also be left */
+.table:has(td:nth-child(2):not(:has(.badge))) th:nth-child(2) {
+    text-align: left !important;
+}
+
+/* All table cells default to left-aligned */
+.table td {
+    text-align: left !important;
+}
+
+/* Center columns that contain badges (regardless of position) */
+.table td:has(.badge) {
+    text-align: center !important;
+}
+
+/* Center numeric columns (2nd, 3rd, 4th) - but exclude if they contain links/buttons/badges */
+.table td:nth-child(2):not(:has(a)):not(:has(.btn)):not(:has(.badge)),
+.table td:nth-child(3):not(:has(a)):not(:has(.btn)):not(:has(.badge)),
+.table td:nth-child(4):not(:has(a)):not(:has(.btn)):not(:has(.badge)) {
+    text-align: center !important;
+}
+
+/* Ensure percentage column content is centered */
+.table td:nth-child(3) > div {
+    text-align: center;
+}
+
+/* Center action buttons/icons column (last column) */
 .table td:last-child {
     white-space: nowrap;
     min-width: 120px;
     max-width: none;
     width: auto;
+    text-align: center !important;
+}
+
+/* Headers: default left */
+.table th {
+    text-align: left !important;
+}
+
+/* Center headers for numeric columns (2nd, 3rd, 4th) */
+.table th:nth-child(2),
+.table th:nth-child(3),
+.table th:nth-child(4) {
+    text-align: center !important;
+}
+
+/* Center header for "Attended" column (7th column) */
+.table th:nth-child(7) {
+    text-align: center !important;
+}
+
+/* Center header for Actions column (last) */
+.table th:last-child {
+    text-align: center !important;
+}
+
+/* Ensure badges and numbers stay centered */
+.table td .badge {
+    display: inline-block;
+    text-align: center;
+}
+
+/* Ensure numeric content in centered columns stays centered */
+.table td:has(.badge) *,
+.table td[style*="text-align: center"] * {
+    text-align: center;
+}
+
+/* Ensure action buttons stay centered */
+.table td:last-child .btn,
+.table td:last-child .action-buttons {
+    text-align: center;
 }
 
 .table td:last-child .action-buttons {
     flex-wrap: nowrap;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 /* Center action button when it's the only one */
@@ -1356,18 +1450,44 @@ body {
 
 /* Upcoming Events List */
 .upcoming-events-list {
-    padding: 8px 0;
+    padding: 4px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Custom scrollbar for events list */
+.upcoming-events-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.upcoming-events-list::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 3px;
+}
+
+.upcoming-events-list::-webkit-scrollbar-thumb {
+    background: var(--pastel-blue-light);
+    border-radius: 3px;
+}
+
+.upcoming-events-list::-webkit-scrollbar-thumb:hover {
+    background: var(--blue-primary);
 }
 
 .event-section {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+}
+
+.event-section:last-child {
+    margin-bottom: 0;
 }
 
 .event-section-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-dark);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
@@ -1375,7 +1495,7 @@ body {
 }
 
 .event-item {
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px solid var(--gray-medium);
     transition: background 0.2s;
 }
@@ -1395,7 +1515,78 @@ body {
 .event-item-content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+}
+
+/* Reminders Section */
+.reminders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reminder-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: var(--gray-light);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.reminder-item:hover {
+    background: var(--pastel-blue-lighter);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.reminder-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168, 213, 226, 0.2);
+    border-radius: 50%;
+    color: var(--blue-primary);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.reminder-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.reminder-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+.reminder-years,
+.reminder-attendance {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-left: 6px;
+}
+
+.reminder-date {
+    font-size: 13px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reminder-date i {
+    font-size: 12px;
+    color: var(--blue-primary);
 }
 
 .event-name {
@@ -1548,10 +1739,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(168, 213, 226, 0.25); /* Light blue oval background */
+    background: rgba(168, 213, 226, 0.25); /* Light blue circular background */
     border-radius: 50%; /* Circular shape */
     color: #4A90E2; /* Solid blue color */
     font-size: 28px;
+    flex-shrink: 0;
 }
 
 .upcoming-section-icon i {
@@ -1560,6 +1752,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: inherit; /* Use parent font-size for consistency */
 }
 
 .upcoming-section-list {

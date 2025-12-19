@@ -21,22 +21,38 @@ $eventType = isset($_GET['event_type']) ? sanitizeInput($_GET['event_type']) : '
 $startDate = date('Y-m-d', strtotime("+$week weeks monday"));
 $endDate = date('Y-m-d', strtotime("+$week weeks sunday"));
 
-// Get birthday statistics (count for next 7 days)
+// Get birthday statistics (count for next 7 days) - includes both member DOB and Birthday events
 $result = $conn->query("
-    SELECT COUNT(*) as count
-    FROM Members 
-    WHERE dob IS NOT NULL 
-    AND DATE(CONCAT(
-        CASE 
-            WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
-            THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
-            ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
-        END, '-', DATE_FORMAT(dob, '%m-%d')
-    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    SELECT COUNT(*) as count FROM (
+        SELECT DATE(CONCAT(
+            CASE 
+                WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+            END, '-', DATE_FORMAT(dob, '%m-%d')
+        )) as next_birthday
+        FROM Members 
+        WHERE dob IS NOT NULL 
+        AND DATE(CONCAT(
+            CASE 
+                WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+            END, '-', DATE_FORMAT(dob, '%m-%d')
+        )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+        UNION ALL
+        SELECT date as next_birthday
+        FROM Events
+        WHERE event_type = 'Birthday'
+        AND date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ) as combined_birthdays
 ");
 $birthdayStats = $result->fetch_assoc();
 
-// Get top 5 upcoming birthdays for display
+// Get top 5 upcoming birthdays for display - combine member DOB and Birthday events
+$birthdays = [];
+
+// Get birthdays from member DOB
 $result = $conn->query("
     SELECT first_name, last_name, dob, 
            DATE(CONCAT(
@@ -58,24 +74,88 @@ $result = $conn->query("
     ORDER BY next_birthday
     LIMIT 5
 ");
-$birthdays = $result->fetch_all(MYSQLI_ASSOC);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $birthdays[] = [
+            'first_name' => $row['first_name'],
+            'last_name' => $row['last_name'],
+            'dob' => $row['dob'],
+            'next_birthday' => $row['next_birthday']
+        ];
+    }
+}
 
-// Get anniversary statistics (count for next 7 days) - using date_joined as anniversary date
+// Get Birthday events from Events table
 $result = $conn->query("
-    SELECT COUNT(*) as count
-    FROM Members 
-    WHERE date_joined IS NOT NULL 
-    AND DATE(CONCAT(
-        CASE 
-            WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
-            THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
-            ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
-        END, '-', DATE_FORMAT(date_joined, '%m-%d')
-    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    SELECT e.date as next_birthday, m.first_name, m.last_name, m.dob
+    FROM Events e
+    LEFT JOIN Members m ON e.member_id = m.mem_id
+    WHERE e.event_type = 'Birthday'
+    AND e.date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY e.date
+    LIMIT 5
+");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        // Only add if not already in list (avoid duplicates)
+        $exists = false;
+        foreach ($birthdays as $existing) {
+            if ($existing['next_birthday'] == $row['next_birthday'] && 
+                $existing['first_name'] == $row['first_name'] && 
+                $existing['last_name'] == $row['last_name']) {
+                $exists = true;
+                break;
+            }
+        }
+        if (!$exists) {
+            $birthdays[] = [
+                'first_name' => $row['first_name'] ?: 'Unknown',
+                'last_name' => $row['last_name'] ?: 'Member',
+                'dob' => $row['dob'],
+                'next_birthday' => $row['next_birthday']
+            ];
+        }
+    }
+}
+
+// Sort by date and limit to 5
+usort($birthdays, function($a, $b) {
+    return strtotime($a['next_birthday']) - strtotime($b['next_birthday']);
+});
+$birthdays = array_slice($birthdays, 0, 5);
+
+// Get anniversary statistics (count for next 7 days) - includes both member date_joined and Anniversary events
+$result = $conn->query("
+    SELECT COUNT(*) as count FROM (
+        SELECT DATE(CONCAT(
+            CASE 
+                WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+            END, '-', DATE_FORMAT(date_joined, '%m-%d')
+        )) as next_anniversary
+        FROM Members 
+        WHERE date_joined IS NOT NULL 
+        AND DATE(CONCAT(
+            CASE 
+                WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+            END, '-', DATE_FORMAT(date_joined, '%m-%d')
+        )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+        UNION ALL
+        SELECT date as next_anniversary
+        FROM Events
+        WHERE event_type = 'Anniversary'
+        AND date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ) as combined_anniversaries
 ");
 $anniversaryStats = $result->fetch_assoc();
 
-// Get top 5 upcoming anniversaries for display
+// Get top 5 upcoming anniversaries for display - combine member date_joined and Anniversary events
+$anniversaries = [];
+
+// Get anniversaries from member date_joined
 $result = $conn->query("
     SELECT first_name, last_name, date_joined,
            DATE(CONCAT(
@@ -84,7 +164,13 @@ $result = $conn->query("
                    THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
                    ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
                END, '-', DATE_FORMAT(date_joined, '%m-%d')
-           )) as next_anniversary
+           )) as next_anniversary,
+           TIMESTAMPDIFF(YEAR, date_joined, CURRENT_DATE) + 
+           CASE 
+               WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+               THEN 0 
+               ELSE 1 
+           END as years
     FROM Members 
     WHERE date_joined IS NOT NULL 
     AND DATE(CONCAT(
@@ -97,7 +183,63 @@ $result = $conn->query("
     ORDER BY next_anniversary
     LIMIT 5
 ");
-$anniversaries = $result->fetch_all(MYSQLI_ASSOC);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $anniversaries[] = [
+            'first_name' => $row['first_name'],
+            'last_name' => $row['last_name'],
+            'date_joined' => $row['date_joined'],
+            'next_anniversary' => $row['next_anniversary'],
+            'years' => $row['years']
+        ];
+    }
+}
+
+// Get Anniversary events from Events table
+$result = $conn->query("
+    SELECT e.date as next_anniversary, m.first_name, m.last_name, m.date_joined,
+           TIMESTAMPDIFF(YEAR, COALESCE(m.date_joined, e.date), CURRENT_DATE) + 
+           CASE 
+               WHEN DATE_FORMAT(COALESCE(m.date_joined, e.date), '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+               THEN 0 
+               ELSE 1 
+           END as years
+    FROM Events e
+    LEFT JOIN Members m ON e.member_id = m.mem_id
+    WHERE e.event_type = 'Anniversary'
+    AND e.date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY e.date
+    LIMIT 5
+");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        // Only add if not already in list (avoid duplicates)
+        $exists = false;
+        foreach ($anniversaries as $existing) {
+            if ($existing['next_anniversary'] == $row['next_anniversary'] && 
+                $existing['first_name'] == $row['first_name'] && 
+                $existing['last_name'] == $row['last_name']) {
+                $exists = true;
+                break;
+            }
+        }
+        if (!$exists) {
+            $anniversaries[] = [
+                'first_name' => $row['first_name'] ?: 'Unknown',
+                'last_name' => $row['last_name'] ?: 'Member',
+                'date_joined' => $row['date_joined'],
+                'next_anniversary' => $row['next_anniversary'],
+                'years' => $row['years'] ?: 0
+            ];
+        }
+    }
+}
+
+// Sort by date and limit to 5
+usort($anniversaries, function($a, $b) {
+    return strtotime($a['next_anniversary']) - strtotime($b['next_anniversary']);
+});
+$anniversaries = array_slice($anniversaries, 0, 5);
 
 // Get event statistics (count for next 14 days)
 $query = "SELECT COUNT(*) as count FROM Events WHERE date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 14 DAY)";

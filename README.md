@@ -1,9 +1,5 @@
-# Church Management and Information System (CMIS)
-
-A comprehensive web-based church management system built with PHP, MySQL, JavaScript, HTML5, CSS3, and Bootstrap 5.
 
 ## Features
-
 - **Membership Management**: Complete member registration, editing, and tracking
 - **Attendance Management**: Track attendance across different ministries
 - **Event & Milestone Tracking**: Manage birthdays, weddings, anniversaries, baptisms, and deaths
@@ -13,7 +9,6 @@ A comprehensive web-based church management system built with PHP, MySQL, JavaSc
 - **Dashboard**: Overview with statistics and trends
 
 ## Technology Stack
-
 - **Backend**: PHP 8+
 - **Database**: MySQL/MariaDB
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
@@ -21,7 +16,6 @@ A comprehensive web-based church management system built with PHP, MySQL, JavaSc
 - **Charts**: Chart.js
 
 ## Installation
-
 1. **Prerequisites**:
    - XAMPP (or similar PHP/MySQL environment)
    - PHP 8.0 or higher
@@ -91,7 +85,6 @@ The database includes the following tables:
 
 
 ## Authors
-
 - Joshane Beecher (2304845)
 - Abbygayle Higgins (2106327)
 - Serena Morris (2208659)

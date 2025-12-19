@@ -120,12 +120,12 @@ if ($currentPage === 'membership.php') $currentReport = 'membership';
                         <tr>
                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                             <td><strong><?php echo $row['active_members']; ?></strong></td>
-                            <td>
-                                <?php 
+                            <td style="text-align: center;">
+                                <div style="margin-bottom: 4px;"><?php 
                                 $percentage = $totalActiveInMinistries > 0 ? round(($row['active_members'] / $totalActiveInMinistries) * 100, 1) : 0;
                                 echo $percentage . '%';
-                                ?>
-                                <div style="width: 100%; background: var(--gray-medium); height: 8px; border-radius: 4px; margin-top: 4px;">
+                                ?></div>
+                                <div style="width: 100%; background: var(--gray-medium); height: 8px; border-radius: 4px;">
                                     <div style="width: <?php echo $percentage; ?>%; background: var(--pastel-blue-dark); height: 8px; border-radius: 4px;"></div>
                                 </div>
                             </td>

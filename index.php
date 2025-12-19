@@ -125,6 +125,119 @@ $result = $conn->query("
 ");
 $upcomingAnniversaries = $result->fetch_all(MYSQLI_ASSOC);
 
+// Upcoming events from Events table (next 2 weeks)
+$result = $conn->query("
+    SELECT e.*, m.first_name, m.last_name
+    FROM Events e
+    LEFT JOIN Members m ON e.member_id = m.mem_id
+    WHERE e.date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 14 DAY)
+    ORDER BY e.date ASC
+    LIMIT 5
+");
+$upcomingEvents = $result->fetch_all(MYSQLI_ASSOC);
+
+// Get reminders data (next 7 days for birthdays/anniversaries, next 3 days for meetings)
+$reminders = [];
+
+// Upcoming birthdays for reminders (next 7 days)
+$result = $conn->query("
+    SELECT first_name, last_name, email, dob,
+           DATE(CONCAT(
+               CASE 
+                   WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                   THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                   ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+               END, '-', DATE_FORMAT(dob, '%m-%d')
+           )) as next_birthday
+    FROM Members 
+    WHERE dob IS NOT NULL 
+    AND DATE(CONCAT(
+        CASE 
+            WHEN DATE_FORMAT(dob, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+            THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+            ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+        END, '-', DATE_FORMAT(dob, '%m-%d')
+    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY next_birthday
+    LIMIT 5
+");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $reminders[] = [
+            'type' => 'birthday',
+            'member' => $row['first_name'] . ' ' . $row['last_name'],
+            'date' => $row['next_birthday'],
+            'display_date' => date('M j', strtotime($row['next_birthday']))
+        ];
+    }
+}
+
+// Upcoming anniversaries for reminders (next 7 days)
+$result = $conn->query("
+    SELECT first_name, last_name, email, date_joined,
+           DATE(CONCAT(
+               CASE 
+                   WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+                   THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+                   ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+               END, '-', DATE_FORMAT(date_joined, '%m-%d')
+           )) as next_anniversary,
+           TIMESTAMPDIFF(YEAR, date_joined, CURRENT_DATE) + 
+           CASE 
+               WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+               THEN 0 
+               ELSE 1 
+           END as years
+    FROM Members 
+    WHERE date_joined IS NOT NULL 
+    AND DATE(CONCAT(
+        CASE 
+            WHEN DATE_FORMAT(date_joined, '%m-%d') >= DATE_FORMAT(CURRENT_DATE, '%m-%d') 
+            THEN DATE_FORMAT(CURRENT_DATE, '%Y') 
+            ELSE DATE_FORMAT(CURRENT_DATE, '%Y') + 1 
+        END, '-', DATE_FORMAT(date_joined, '%m-%d')
+    )) BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY next_anniversary
+    LIMIT 5
+");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $reminders[] = [
+            'type' => 'anniversary',
+            'member' => $row['first_name'] . ' ' . $row['last_name'],
+            'date' => $row['next_anniversary'],
+            'years' => $row['years'],
+            'display_date' => date('M j', strtotime($row['next_anniversary']))
+        ];
+    }
+}
+
+// Upcoming ministry meetings for reminders (next 3 days)
+$result = $conn->query("
+    SELECT m.name as ministry_name, a.date, a.count as expected_attendance
+    FROM Attendance a
+    JOIN Ministries m ON a.ministry_id = m.id
+    WHERE a.date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 3 DAY)
+    ORDER BY a.date
+    LIMIT 5
+");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $reminders[] = [
+            'type' => 'ministry_meeting',
+            'ministry' => $row['ministry_name'],
+            'date' => $row['date'],
+            'expected_attendance' => $row['expected_attendance'],
+            'display_date' => date('M j, Y', strtotime($row['date']))
+        ];
+    }
+}
+
+// Sort reminders by date
+usort($reminders, function($a, $b) {
+    return strtotime($a['date']) - strtotime($b['date']);
+});
+
 closeDBConnection($conn);
 
 include __DIR__ . '/includes/header.php';
@@ -158,31 +271,51 @@ include __DIR__ . '/includes/header.php';
 
 <div class="row">
     <div class="col-md-8">
-        <div class="card">
+        <div class="card" style="display: flex; flex-direction: column;">
             <div class="card-header">
                 <div>
                     <h3 class="card-title">Attendance Trends</h3>
                     <p class="card-subtitle">Weekly total attendance (last 4 weeks)</p>
                 </div>
             </div>
-            <div style="position: relative; height: 300px; padding: 20px;">
+            <div style="position: relative; height: 300px; margin-bottom: 0; flex-shrink: 0;">
                 <canvas id="attendanceChart"></canvas>
             </div>
         </div>
     </div>
     
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+        <div class="card" style="display: flex; flex-direction: column;">
+            <div class="card-header" style="flex-shrink: 0;">
                 <div>
                     <h3 class="card-title">Upcoming Events</h3>
                     <p class="card-subtitle">Next 2 weeks</p>
                 </div>
             </div>
-            <?php if (count($upcomingBirthdays) > 0 || count($upcomingAnniversaries) > 0): ?>
-                <div class="upcoming-events-list">
-                    <?php if (count($upcomingBirthdays) > 0): ?>
+            <?php if (count($upcomingBirthdays) > 0 || count($upcomingAnniversaries) > 0 || count($upcomingEvents) > 0): ?>
+                <div class="upcoming-events-list" style="flex: 1; min-height: 0; overflow-y: auto;">
+                    <?php if (count($upcomingEvents) > 0): ?>
                         <div class="event-section">
+                            <h5 class="event-section-title">
+                                <i class="fas fa-calendar-alt" style="color: var(--blue-primary); margin-right: 8px;"></i>
+                                Events
+                            </h5>
+                            <?php foreach ($upcomingEvents as $event): ?>
+                                <div class="event-item">
+                                    <div class="event-item-content">
+                                        <strong class="event-name"><?php echo htmlspecialchars(ucfirst($event['event_type'])); ?></strong>
+                                        <?php if ($event['first_name']): ?>
+                                            <span class="event-member"><?php echo htmlspecialchars($event['first_name'] . ' ' . $event['last_name']); ?></span>
+                                        <?php endif; ?>
+                                        <span class="event-date"><?php echo formatDate($event['date']); ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (count($upcomingBirthdays) > 0): ?>
+                        <div class="event-section" style="margin-top: <?php echo count($upcomingEvents) > 0 ? '12px' : '0'; ?>;">
                             <h5 class="event-section-title">
                                 <i class="fas fa-birthday-cake" style="color: var(--blue-primary); margin-right: 8px;"></i>
                                 Birthdays
@@ -199,7 +332,7 @@ include __DIR__ . '/includes/header.php';
                     <?php endif; ?>
                     
                     <?php if (count($upcomingAnniversaries) > 0): ?>
-                        <div class="event-section" style="margin-top: 24px;">
+                        <div class="event-section" style="margin-top: 12px;">
                             <h5 class="event-section-title">
                                 <i class="fas fa-heart" style="color: var(--blue-primary); margin-right: 8px;"></i>
                                 Anniversaries
@@ -324,6 +457,68 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Reminders Section -->
+<div class="row" style="margin-top: 24px;">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">
+                        <i class="fas fa-bell" style="color: var(--blue-primary); margin-right: 8px;"></i>
+                        Reminders
+                    </h3>
+                    <p class="card-subtitle">Upcoming birthdays, anniversaries, and ministry meetings</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <?php if (count($reminders) > 0): ?>
+                    <div class="reminders-list">
+                        <?php foreach ($reminders as $reminder): ?>
+                            <div class="reminder-item">
+                                <div class="reminder-icon">
+                                    <?php if ($reminder['type'] === 'birthday'): ?>
+                                        <i class="fas fa-birthday-cake"></i>
+                                    <?php elseif ($reminder['type'] === 'anniversary'): ?>
+                                        <i class="fas fa-heart"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-calendar-alt"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="reminder-content">
+                                    <div class="reminder-title">
+                                        <?php if ($reminder['type'] === 'birthday'): ?>
+                                            <?php echo htmlspecialchars($reminder['member']); ?>'s Birthday
+                                        <?php elseif ($reminder['type'] === 'anniversary'): ?>
+                                            <?php echo htmlspecialchars($reminder['member']); ?>'s Anniversary
+                                            <?php if (isset($reminder['years'])): ?>
+                                                <span class="reminder-years">(<?php echo $reminder['years']; ?> years)</span>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <?php echo htmlspecialchars($reminder['ministry']); ?> Meeting
+                                            <?php if (isset($reminder['expected_attendance'])): ?>
+                                                <span class="reminder-attendance">(Expected: <?php echo $reminder['expected_attendance']; ?>)</span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="reminder-date">
+                                        <i class="fas fa-calendar"></i> <?php echo $reminder['display_date']; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>No reminders</h3>
+                        <p>You're all caught up! No upcoming reminders for the next 7 days.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
 
