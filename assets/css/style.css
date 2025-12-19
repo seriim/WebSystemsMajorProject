@@ -1040,15 +1040,6 @@ body {
     border-bottom: 1px solid var(--gray-medium);
 }
 
-.table th {
-    padding: 16px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-dark);
-    font-size: 14px;
-    border-bottom: 1px solid var(--gray-medium);
-}
-
 .table td {
     padding: 16px;
     border-bottom: 1px solid var(--gray-medium);
@@ -1069,23 +1060,6 @@ body {
 }
 
 .table th:first-child {
-    text-align: left !important;
-}
-
-/* Second column - center if it contains badge/number, otherwise left */
-.table td:nth-child(2) {
-    min-width: 200px;
-    max-width: 250px;
-    text-align: center !important; /* Default to center for numeric columns */
-}
-
-/* Override: Keep 2nd column left if it's text (like Description) - no badge, no number-only */
-.table td:nth-child(2):not(:has(.badge)):not(:has(strong:only-child)) {
-    text-align: left !important;
-}
-
-/* If 2nd column is left, its header should also be left */
-.table:has(td:nth-child(2):not(:has(.badge))) th:nth-child(2) {
     text-align: left !important;
 }
 
@@ -1149,20 +1123,15 @@ body {
 }
 
 /* Ensure numeric content in centered columns stays centered */
-.table td:has(.badge) *,
-.table td[style*="text-align: center"] * {
+.table td:has(.badge) * {
     text-align: center;
 }
 
 /* Ensure action buttons stay centered */
-.table td:last-child .btn,
-.table td:last-child .action-buttons {
-    text-align: center;
-}
-
 .table td:last-child .action-buttons {
     flex-wrap: nowrap;
     justify-content: center;
+    text-align: center;
 }
 
 /* Center action button when it's the only one */

@@ -135,7 +135,7 @@ if ($result) {
 
 closeDBConnection($conn);
 
-// Log reminders (in production, this would send emails)
+// Log reminders (in production, this would send emails) didnt get a chance to test it out or work on it more 
 $logFile = __DIR__ . '/reminder_log.txt';
 $logContent = "=== Reminder System Run: " . date('Y-m-d H:i:s') . " ===\n\n";
 
